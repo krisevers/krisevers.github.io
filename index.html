@@ -26,7 +26,10 @@
           Besides the integrate-and-fire mechanism the model also has a adaptive threshold mechanism instead of a fixed threshold. 
           This makes the model very flexible when trying to data. The adaptive threshold mechanism can be interpreted as the neuron's 
           spike-frequency adaptation (SFA) or sub-threshold adaptation (STA) dynamics. In the following I will go through the mathematical 
-          description of the model and provide a python implementation of the model as well as a simple random balanced network of GIF neurons.</p>
+          description of the model and provide a python implementation of the model as well as a simple random balanced network of GIF neurons. 
+          <br> <br>
+          The membrane potential in the GIF model is governed by: $$\tau_m \frac{d\mu_i}{dt} = -\mu_i + \mu_{rest} + R_i*I_{ext} + \sum_{j=1}^{N} W_{ij}*\nu_j$$
+      </p>
     </div>
     
     <h3 id="images">External interactions of the canonical cortical microcircuit</h3>
