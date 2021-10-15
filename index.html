@@ -36,9 +36,9 @@
             <input type="checkbox" id="sn-anything" class="sidenote-toggle" />
             <span class="sidenote">
             <pre><code class="language-python">
-def dmu():
+def dmu(mu, Iext, W, nu):
     '''update membrane potential'''
-    return 
+    return -mu + mu_rest + R * Iext + W @ nu
     
 mu += dmu()
             </code></pre>
@@ -48,6 +48,12 @@ mu += dmu()
           The membrane potential in the GIF model is governed by: $$\tau_m \frac{d\mu_i}{dt} = -\mu_i + \mu_{rest} + R_i*I_{ext} + \sum_{j=1}^{N} W_{ij}*\nu_j$$
       </p>
     </div>
+ 
+    
+    
+    
+    
+    
  
  <!--
     <h3 id="images">External interactions of the canonical cortical microcircuit</h3>
