@@ -36,11 +36,12 @@
             <input type="checkbox" id="sn-anything" class="sidenote-toggle" />
             <span class="sidenote">
             <pre><code class="language-python">
-def dmu(mu, Iext, W, nu):
+def dmu(mu, Iext, W, nu, dt=0.1):
     '''update membrane potential'''
-    return -mu + mu_rest + R * Iext + W @ nu
+    dmu = -mu + mu_rest + R * Iext + W @ nu
+    return dmu * dt
     
-mu += dmu()
+mu += dmu(mu, Iext, W, nu)
             </code></pre>
             </span>
         
