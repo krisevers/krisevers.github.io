@@ -40,8 +40,6 @@ def dmu(mu, Iext, W, nu, dt=0.1):
     '''update membrane potential'''
     dmu = -mu + mu_rest + R * Iext + W @ nu
     return dmu * dt
-    
-mu += dmu(mu, Iext, W, nu)
             </code></pre>
             </span>
         
