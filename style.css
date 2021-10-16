@@ -35,7 +35,7 @@ pre[class*='language-'] {
 }
 
 pre[class*='language-'] {
-  background: #F0F0F0;
+  background: none;
 }
 
 /* Inline code */
