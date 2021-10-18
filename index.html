@@ -47,41 +47,6 @@
       </body> 
     </html>
 
-
-    <div class="GIF">
-      <h2>GIF Model</h2>
-      <p>The generalized integrate-and-fire neuron model can be fit to a wide range of electrophysiological data from a number of species. 
-          Besides the integrate-and-fire mechanism the model also has a adaptive threshold mechanism instead of a fixed threshold. 
-          This makes the model very flexible when trying to data. The adaptive threshold mechanism can be interpreted as the neuron's 
-          spike-frequency adaptation (SFA) or sub-threshold adaptation (STA) dynamics. In the following I will go through the mathematical 
-          description of the model and provide a python implementation of the model as well as a simple random balanced network of GIF neurons. 
-          <br>
-        </p>
-        
-            <label for="sn-anything" class="sidenote-toggle"></label>
-            <input type="checkbox" id="sn-anything" class="sidenote-toggle" />
-            <span class="sidenote">
-            <pre><code class="language-python">
-def dmu(mu, Iext, W, nu, dt=0.1):
-    '''update membrane potential'''
-    dmu = -mu + mu_rest + R * Iext + W @ nu
-    return dmu * dt
-            </code></pre>
-            </span>
-        
-        <p>
-          The membrane potential in the GIF model is governed by: $$\tau_m \frac{d\mu_i}{dt} = -\mu_i + \mu_{rest} + R_i*I_{ext} + \sum_{j=1}^{N} W_{ij}*\nu_j$$
-            
-          Where \(\mu_i\), \(\mu_{rest}\), \(R_i\) and \(I_{ext}\) are the current membrane potential, the resting membrane potential, the neuron's membrane resistance and
-          the external input current to the neuron, respectively. \(W\) is the weights matrix of the recurrent neural network and \(\nu\) the activities of all neurons in the network.
-      </p>
-    </div>
- 
-    
-    
-    
-    
-    
  
  <!--
     <h3 id="images">External interactions of the canonical cortical microcircuit</h3>
