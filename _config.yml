@@ -7,7 +7,7 @@
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Dynamical Systems & Neuroscience"
+title                    : "Kris Evers"
 title_separator          : "-"
 name                     : &name "Kris Evers"
 description              : &description "PhD Candidate Cognitive Neuroscience"
