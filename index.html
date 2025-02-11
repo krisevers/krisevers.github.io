@@ -10,11 +10,16 @@
     <h1>Kris Evers</h1>
     <hr>
 
-    <div class="about">
-        Experienced applied mathematician, data scientist, and software engineer.
+    <canvas id="canvas" display="block"> 
+        Your browser does not support HTML5 
+    </canvas> 
+    <script src="js/background.js"></script>
+
+    <div class="paragraph">
+        Dynamical Systems, Signal Processing, Machine Learning and more.
     </div>
 
-    <h2>Projects</h2>
+    <!-- <h2>Experience</h2>
     <div class="hr2">
     </div>
     <div class="project"></div>
@@ -25,7 +30,42 @@
         <div class="skills sp">Signal Processing</div>
         <div class="skills sa">Statistical Analysis</div>
         <div class="skills ml">Machine Learning</div>
+    </div> -->
+
+    <h2>Projects</h2>
+    <div class="hr2"></div>
+    <div class="project">
+        <div onclick="location.href='projects/sbi.html';" style="cursor: pointer;">
+            <div class="project-title">Tutorial on Simulation Based Inference for Biophysical Models</div>
+            <div class="project-description">
+                A tutorial on simulation based inference using Python, including the bootstrap, permutation tests, and Monte Carlo methods.
+            </div>
+        </div>
     </div>
+
+    <div class="hr2"></div>
+    <div class="project">
+        <div onclick="location.href='projects/hh.html';" style="cursor: pointer;">
+            <div class="project-title">Hodgkin-Huxley Grid</div>
+            <div class="project-description">
+                A sheet of Hodgkin-Huxley neurons simulated in WebGL.
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="project">
+        <div class="project-title">Biophysics Informed Machine Learning</div>
+        <div class="project-description">
+            A project on using biophysical models to inform machine learning algorithms, with a focus on the Hodgkin-Huxley model.
+        </div>
+    </div>
+
+    <div class="project">
+        <div class="project-title">Central Limit Theorem in Population Growth</div>
+        <div class="project-description">
+            A project on the Central Limit Theorem in population growth, with a focus on the logistic map.
+        </div>
+    </div> -->
 
 </body>
 

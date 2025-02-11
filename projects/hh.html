@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <script id="vertex" type="x-shader/x-vertex">
+            attribute vec4 a_Position;
+            attribute vec4 a_Color;
+            varying vec4 v_Color;
+            varying vec2 v_Position;
+            void main() {
+                gl_Position = a_Position;
+                gl_PointSize = 10.0; // Increase point size for better visibility
+                v_Color = a_Color;
+                v_Position = a_Position.xy;
+            }
+        </script>
+        <script id="fragment" type="x-shader/x-fragment">
+            #ifdef GL_ES
+            precision mediump float;
+            #endif
+            varying vec4 v_Color;
+            varying vec2 v_Position;
+            uniform sampler2D u_State;
+            uniform float u_Time;
+            void main() {
+                float dist = length(gl_PointCoord - vec2(0.5, 0.5));
+                float alpha = 1.0 - smoothstep(0.0, 0.5, dist);
+                vec3 color = v_Color.rgb; // current color
+
+                TODO: Implement the Hodgkin-Huxley model here
+
+                gl_FragColor = vec4(color, alpha);
+            }
+        </script>
+
+        <script type="text/javascript">
+            var points = [];
+            var index = 0;
+
+            function init() {
+                // Get canvas
+                var canvas = document.getElementById('canvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                gl = canvas.getContext('webgl');
+                gl.viewport(0, 0, canvas.width, canvas.height);
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                // Load shaders
+                var v = document.getElementById('vertex').firstChild.nodeValue;
+                var f = document.getElementById('fragment').firstChild.nodeValue;
+                // Create vertex shader
+                var vs = gl.createShader(gl.VERTEX_SHADER);
+                gl.shaderSource(vs, v);
+                gl.compileShader(vs);
+                // Create fragment shader
+                var fs = gl.createShader(gl.FRAGMENT_SHADER);
+                gl.shaderSource(fs, f);
+                gl.compileShader(fs);
+                // Create program
+                var program = gl.createProgram();
+                gl.attachShader(program, vs);
+                gl.attachShader(program, fs);
+                gl.linkProgram(program);
+
+                gl.useProgram(program);
+
+                // Set up vertex buffer
+                color = [0.0, 0.0, 0.0, 1.0];
+                var vbuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, 8*200, gl.STATIC_DRAW);
+                program.a_Position = gl.getAttribLocation(program, 'a_Position');
+                gl.enableVertexAttribArray(program.a_Position);
+                gl.vertexAttribPointer(program.a_Position, 2, gl.FLOAT, false, 0, 0);
+                // Set up color buffer
+                var cbuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, cbuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, 16*200, gl.STATIC_DRAW);
+                program.a_Color = gl.getAttribLocation(program, 'a_Color');
+                gl.enableVertexAttribArray(program.a_Color);
+                gl.vertexAttribPointer(program.a_Color, 4, gl.FLOAT, false, 0, 0);
+                // Set up time uniform
+                const u_Time = gl.getUniformLocation(program, 'u_Time');
+                // Set up state texture uniform
+                const u_State = gl.getUniformLocation(program, 'u_State');
+
+                // // Set up texture
+                var texture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+
+                // Set up texture parameters
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+                // Set up texture data
+                var data = new Uint8Array(4 * 200 * 200);
+                for (var i = 0; i < 200 * 200; i++) {
+                    data[4 * i + 0] = 255;
+                    data[4 * i + 1] = 255;
+                    data[4 * i + 2] = 255;
+                    data[4 * i + 3] = 255;
+                }
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 200, 200, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+                // Set up event listener
+                canvas.addEventListener("mousedown", function(event) {
+                    x=2*event.clientX/canvas.width-1;
+                    y=2*(canvas.height-event.clientY)/canvas.height-1;
+                    x-=.015
+                    y+=.01
+                    var pts = [x, y];
+                    points.push(pts);
+
+                    var i = index;
+                    gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 8*i, new Float32Array(pts));
+                    gl.bindBuffer(gl.ARRAY_BUFFER, cbuffer);
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 16*i, new Float32Array(color));
+                    index++;
+                    console.log(points);
+                });
+
+                function render(time) {
+
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+
+                    // Set the time uniform
+                    gl.uniform1f(u_Time, time * 0.001);
+
+                    // Set the state texture
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+
+                    gl.drawArrays(gl.POINTS, 0, points.length);
+
+                    requestAnimationFrame(render);
+                }
+
+                // Draw
+                requestAnimationFrame(render);
+
+            }
+
+        </script>
+    </head>
+
+    <body onload="init()">
+        <canvas id="canvas" width="100" height="100"> 
+            Your browser does not support HTML5 
+        </canvas>
+    </body>
+
+</html>
