@@ -43,7 +43,7 @@ Hopefully the application becomes clear when we turn the problem on it's head an
 
 ![SBI Lorenz Pairplot](/assets/png/sbi_lorenz_pairplot.png)
 
-*Figure 2: Pairplot from inference procedure of the Lorenz model ground truth parameters $\sigma = 10$, $\beta = \frac{8}{3}$, and $\rho = 28$.
+*Figure 2: Pairplot from inference procedure of the Lorenz model ground truth parameters $\sigma = 10$, $\beta = \frac{8}{3}$, and $\rho = 28$.*
 
 This is a toy example, but not a trivial one. The Lorenz system has chaotic dynamics which are common in a lot of systems found in nature. The ability to infer parameters from systems from which we can only measure chaotic and unpredictable observations is very interesting. In a follow-up post I will dive into how the same technique can be applied to infer neural activations from brain activity measurements.
 
