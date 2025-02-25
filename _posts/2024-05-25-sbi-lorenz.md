@@ -21,7 +21,7 @@ $$
 
 This dataset can be used to train a neural density estimator (specific kind of deep neural network for training distributions instead of classes) which will learn the distribution which quantifies the relationship between parameters and observations. We can apply new observation data to this distribution and infer an approximation of the posterior $p(\theta,\psi_{new})$. In other words, we can approximate the set of parameters given a new set of observations. This methods allows for amortized inference afeter the training procedure is complete (i.e. simulations of the model are only run to obtain the dataset, after training simulating is not required anymore).
 
-![SBI Hodgkin-Huxley](../assets/png/sbi_hh.png)
+![SBI Hodgkin-Huxley](/assets/png/sbi_hh.png)
 
 *Figure 1: Example simulation based inference procedure on Hodgin-Huxley spiking neuron model.*
 
@@ -41,7 +41,7 @@ The Lorenz system has 3 parameters ($\sigma$, $\beta$, and $\rho$), 3 variables 
 
 Hopefully the application becomes clear when we turn the problem on it's head and perform inference. For example, if I generate some data by running a single simulation of the model with parameters $\sigma = 10$, $\beta = \frac{8}{3}$, and $\rho = 28$, and then only give the simulated (or observations) to the neural network, it is clearly able to recover the ground truth parameters. 
 
-![SBI Lorenz Pairplot](../assets/png/sbi_lorenz_pairplot.png)
+![SBI Lorenz Pairplot](/assets/png/sbi_lorenz_pairplot.png)
 
 This is a toy example, but not a trivial one. The Lorenz system has chaotic dynamics which are common in a lot of systems found in nature. The ability to infer parameters from systems from which we can only measure chaotic and unpredictable observations is very interesting. In a follow-up post I will dive into how the same technique can be applied to infer neural activations from brain activity measurements.
 
