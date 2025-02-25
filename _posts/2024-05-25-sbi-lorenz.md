@@ -48,7 +48,7 @@ Hopefully the application becomes clear when we turn the problem on it's head an
 This is a toy example, but not a trivial one. The Lorenz system has chaotic dynamics which are common in a lot of systems found in nature. The ability to infer parameters from systems from which we can only measure chaotic and unpredictable observations is very interesting. In a follow-up post I will dive into how the same technique can be applied to infer neural activations from brain activity measurements.
 
 ### Notes
-- The search space grotws very fast with the number of parameters that are of interest for the inference.
+- The search space grows very fast with the number of parameters that are of interest for the inference.
 - The quality of the inference depends heavily on the quality and diversity of the simulations used for training.
 - Choosing appropriate summary statistics is crucial for the performance of the neural density estimator.
 - It is important to validate the trained model with independent test data to ensure its generalizability.
