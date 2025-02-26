@@ -63,7 +63,7 @@ defaults:
 
 markdown: redcarpet
 redcarpet:
-  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "strikethrough", "superscript", "with_toc_data"]
+  extensions: ["no_intra_emphasis", "fenced_code_blocks", "highlight", "autolink", "tables", "strikethrough", "superscript", "with_toc_data"]
   no_intra_emphasis: true
   fenced_code_blocks: true
   highlight: true
