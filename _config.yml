@@ -1,14 +1,14 @@
 site: Kris Evers
 url: krisevers.github.io
 title: Kris Evers
-description: Simple and minimalistic jekyll blogging theme.
+description:
 twitter:
   username: #yourusername
   card: summary
   creator: #yourusername
 author:
-  twitter: 
-  name: 
+  twitter:
+  name:
   avatar:
   email: krisevers14@gmail.com
   url: krisevers.github.io
@@ -20,19 +20,19 @@ highlighter: none
 
 exclude:
   - .jekyll-cache
-  
+
 compress_html:
   clippings: all
   comments: ["<!-- ", " -->"]
 
 sass:
-  sass_dir:          _sass
-  style:            :compressed
+  sass_dir: _sass
+  style: expanded
 
 plugins:
   - jekyll-paginate
   - jekyll-seo-tag
-  - jekyll-sitemap  
+  - jekyll-sitemap
 
 collections:
   pages:
@@ -41,21 +41,18 @@ collections:
   posts:
     output: true
     permalink: /:year/:month/:day/:slug
-  
+
 defaults:
-  -
-    scope:
+  - scope:
       path: ""
     values:
       layout: "default"
-  -
-    scope:
+  - scope:
       path: ""
       type: "pages"
     values:
       layout: "page"
-  -
-    scope:
+  - scope:
       path: ""
       type: "posts"
     values:
@@ -63,7 +60,17 @@ defaults:
 
 markdown: redcarpet
 redcarpet:
-  extensions: ["no_intra_emphasis", "fenced_code_blocks", "highlight", "autolink", "tables", "strikethrough", "superscript", "with_toc_data"]
+  extensions:
+    [
+      "no_intra_emphasis",
+      "fenced_code_blocks",
+      "highlight",
+      "autolink",
+      "tables",
+      "strikethrough",
+      "superscript",
+      "with_toc_data",
+    ]
   no_intra_emphasis: true
   fenced_code_blocks: true
   highlight: true
