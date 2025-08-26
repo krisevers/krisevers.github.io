@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head id="head">
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1">
+    <title>Kris Evers</title>
+    <link type="text/css" rel="stylesheet" href="/style.css">
+    <link type="text/css" rel="stylesheet" href="/highlight.css">
+    <!-- mathtex -->
+    <link type="text/css" rel="stylesheet" href="/Temml-Local.css">
+    <script defer src="/temml.min.js"></script>
+    <script defer src="/render-mathtex.js"></script>
+    <!-- /mathtex -->
+    
+  <style>
+    .date {
+      font-size: 0.9em;
+      text-align: center;
+    }
+    .title h3{
+      margin-top: 0;
+    }
+
+    figure {
+        align-self: center;
+        text-align: center;
+    }
+  </style>
+
+  </head>
+  <body id="body">
+    <h1 class="site-title">Kris Evers</h1>
+    <nav>
+      <a href="/">About</a>
+      <a href="/writings/">Writings</a>
+    </nav>
+    
+  <span class="date">September 03, 2023</span>
+  <h1>A Python tool for Streamlining Parameter Search in Computational Biology</h1>
+  <div><p>From experience I know that it is a bit of a hassle to explore the parameter space of simulators. You might have several sub-models or post-processing steps which depend on each other. A tool like <a href="https://snakemake.readthedocs.io/en/stable/" target="_blank">Snakemake</a> might help solve this issue, but it is not that straightforward to develop a Snakefile for your needs. Creating a <code>Snakefile</code> pipeline takes a bit of practise. Then there is <a href="https://codeocean.com/" target="_blank">Code Ocean</a> which provides great tools for developing pipelines with a nice interactive visual design. The big disadvantage that it is not open-source and you need a subscription to make use of their tools.</p><p>I wanted a tool which made it easy to generate data from simulators and be able to directly perform training and inference on the parameter space. Because I couldn’t find a open-source tool that suited my needs I started developing my own tool: <a href="https://github.com/krisevers/orca" target="_blank"><code>orca</code></a>. It is a small Python library which generates <code>json</code> files in which the flow of the data is defined. There is a single file where the prior distributions of the parameter space are defined (<code>prior.json</code>). After the pipeline is defined, the file <code>orca.json</code> contains all information about what commands will be executed and in what order.</p><p>I have incorporated the methods to perform training and inference on the simulation results directly within <code>orca</code>. This means that the output data can directly be used to train neural density estimators which can predict parameters given some observational data (simulation based inference).</p><p>In the next iteration of this project I will implement automatic generation of <code>Snakefile</code> pipelines, to get the advantages that Snakemake offers (containerization, etc.) while keeping the utility of this project (i.e. training and inference).</p><hr><p>A simple working example is given with a simple Lorenz system connected to an observation model which computes the cross-correlation between the simulated variables.</p><p>A prior file can be created by running:</p><pre><code class="python"><span class="keyword">from</span> <span class="constructor constant variable">orca</span> <span class="keyword">import</span> <span class="constructor constant variable">prior</span>
+
+<span class="constructor function_builtin constant variable function">set_prior</span>(<span class="string">&apos;prior.json&apos;</span>, <span class="string">&apos;Lorenz&apos;</span>, <span class="string">&apos;sigma&apos;</span>, <span class="string">&apos;uniform&apos;</span>, <span class="constructor constant variable">low</span><span class="operator">=</span><span class="number">0</span>, <span class="constructor constant variable">high</span><span class="operator">=</span><span class="number">20</span>)
+<span class="constructor function_builtin constant variable function">set_prior</span>(<span class="string">&apos;prior.json&apos;</span>, <span class="string">&apos;Lorenz&apos;</span>, <span class="string">&apos;rho&apos;</span>,   <span class="string">&apos;uniform&apos;</span>, <span class="constructor constant variable">low</span><span class="operator">=</span><span class="number">0</span>, <span class="constructor constant variable">high</span><span class="operator">=</span><span class="number">50</span>)
+<span class="constructor function_builtin constant variable function">set_prior</span>(<span class="string">&apos;prior.json&apos;</span>, <span class="string">&apos;Lorenz&apos;</span>, <span class="string">&apos;beta&apos;</span>,  <span class="string">&apos;uniform&apos;</span>, <span class="constructor constant variable">low</span><span class="operator">=</span><span class="number">0</span>, <span class="constructor constant variable">high</span><span class="operator">=</span><span class="number">10</span>)
+</code></pre>
+<p>The Orca class can be called, and models can be appended and run. The following shows a simple workflow for loading models, appending them to the Orca object, and running using the prior file created above:</p><pre><code class="python"><span class="keyword">from</span> <span class="constructor constant variable">orca</span> <span class="keyword">import</span> <span class="constructor constant variable">Orca</span>
+<span class="keyword">from</span> <span class="constructor constant variable">examples</span>.<span class="constructor constant variable">lorenz</span> <span class="keyword">import</span> <span class="constructor constant variable">Lorenz</span>, <span class="constructor constant variable">CrossCorr</span>
+
+<span class="comment"># create the orca object</span>
+<span class="constructor constant variable">O</span> <span class="operator">=</span> <span class="constructor function_builtin constant variable function">Orca</span>(<span class="constructor constant variable">num_simulations</span><span class="operator">=</span><span class="number">100</span>)
+
+<span class="comment"># create the model objects (these should have a call function)</span>
+<span class="constructor constant variable">L</span> <span class="operator">=</span> <span class="constructor function_builtin constant variable function">Lorenz</span>()
+<span class="constructor constant variable">C</span> <span class="operator">=</span> <span class="constructor function_builtin constant variable function">CrossCorr</span>()
+
+<span class="comment"># Append the models to the orca object in the right order (such that output of L is the input of C)</span>
+<span class="constructor constant variable">O</span>.<span class="constructor property constant function_method variable">append</span>(<span class="constructor constant variable">L</span>)
+<span class="constructor constant variable">O</span>.<span class="constructor property constant function_method variable">append</span>(<span class="constructor constant variable">C</span>)
+
+<span class="comment"># run the simulations</span>
+<span class="constructor constant variable">psi</span>, <span class="constructor constant variable">theta</span> <span class="operator">=</span> <span class="constructor constant variable">O</span>.<span class="constructor property constant function_method variable">run</span>(<span class="string">&apos;prior.json&apos;</span>)
+
+<span class="comment"># print a summary of the orca object</span>
+<span class="constructor function_builtin constant variable function">O</span>()
+</code></pre>
+<h3>Notes</h3><ul><li>The repository can be found here: <a href="https://www.github.com/krisevers/orca" target="_blank">github.com/krisevers/orca</a></li><li>The original goal of this project was to automate <code>Snakefile</code> generation. This will be implemented next.</li><li>Code Ocean and Snakemake allow for containerization of the pipeline; an example showing how to do this with <code>orca</code> will be included next.</li><li>This project is in the first place created to make my own life easier, therefore it has not been thoroughly tested on a wide range of problems.</li></ul></div>
+  <div>
+    <!-- <h2>Post list</h2> -->
+    <div></div>
+  </div>
+
+    <footer>
+      <hr>
+      <h5>Kris Evers</h5>
+      <a href="krisevers14@gmail.com">email</a>
+      <a href="https://github.com/krisevers">github</a>
+      <a href="https://orcid.org/0000-0002-3386-1259">orcid</a>
+    </footer>
+  </body>
+</html>
