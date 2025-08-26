@@ -6,8 +6,12 @@
 .draft = false,
 ---
 
-Hi there! I'm Kris. I love tinkering with hard problems.
+## Hi There! I'm Kris
+I love tinkering with hard problems and algorithms.
+I've worked in **computational neuroscience** at Maastricht University on biophysical models of the human brain, developing methods for analyzing complex spatio-temporal neurobiological data.
+A lot of things interest me and this is the place where I organize my ideas and share what I learn along the way.
 
-I've worked in computational neuroscience at Maastricht University on biophysical models of the human brain, and developed data analysis pipelines of MRI.
-A lot of things interest me so this is a place where I organize my ideas.
-I write about a wide range of topics and projects.
+I write about a wide range of topics and projects — from optimizing **biophysics** simulations and building **data-analysis** pipelines,
+to exploring **machine learning** techniques and interesting algorithmic challenges. I'm especially drawn to problems **where mathematical insight meets practical implementation**.
+
+If you're working on related problems and think we might have something to discuss, I'd love to hear from you!
