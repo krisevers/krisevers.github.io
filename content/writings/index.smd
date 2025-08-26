@@ -2,11 +2,6 @@
 .title = "Writings",
 .date = @date("1990-01-01T00:00:00"),
 .author = "Kris Evers",
-.layout = "blog.shtml",
-.alternatives = [{
-    .name = "rss",
-    .layout = "blog.xml",
-    .output = "index.xml",
-}],
+.layout = "writings.shtml",
 .draft = false,
 ---

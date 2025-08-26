@@ -5,27 +5,4 @@
   <h1 :text="$page.title"></h1>
   <div :html="$page.content()"></div>
 
-  <!-- <div class="container">
-
-      <div class="block">
-          <h3>Tech</h3>
-          <li>C</li>
-          <li>C++</li>
-      </div>
-
-      <div class="block">
-          <h3>Science</h3>
-          Biophysical modelling in the neurosciences is a broad topic. There is a range of scales and abstraction levels at which one can construct models.
-          I've worked on abstract oscillator models using the Kuramoto model to detailed spiking neuron models using the Hodgkin-Huxley equations.
-      </div>
-  </div>
-
-  <div class="container">
-
-    <div class="block">
-        <h3>Projects</h3>
-    </div>
-  </div> -->
-
-
 </body>
