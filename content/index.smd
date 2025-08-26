@@ -1,0 +1,13 @@
+---
+.title = "About",
+.date = @date("1990-01-01T00:00:00"),
+.author = "Kris Evers",
+.layout = "index.shtml",
+.draft = false,
+---
+
+Hi there! I'm Kris. I love tinkering with hard problems.
+
+I've worked in computational neuroscience at Maastricht University on biophysical models of the human brain, and developed data analysis pipelines of MRI.
+A lot of things interest me so this is a place where I organize my ideas.
+I write about a wide range of topics and projects.

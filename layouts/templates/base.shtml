@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head id="head">
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1">
+    <title :text="$site.title"></title>
+    <link type="text/css" rel="stylesheet" href="$site.asset('style.css').link()">
+    <link type="text/css" rel="stylesheet" href="$site.asset('highlight.css').link()">
+    <!-- mathtex -->
+    <link type="text/css" rel="stylesheet" href="$site.asset('Temml-Local.css').link()">
+    <script defer src="$site.asset('temml.min.js').link()"></script>
+    <script defer src="$site.asset('render-mathtex.js').link()"></script>
+    <!-- /mathtex -->
+    <super>
+  </head>
+  <body id="body">
+    <h1 class="site-title" :text="$site.title"></h1>
+    <nav>
+      <a href="$site.page('').link()">About</a>
+      <a href="$site.page('writings').link()">Writings</a>
+    </nav>
+    <super>
+    <footer>
+      <hr>
+      <h5>Kris Evers</h5>
+      <a href="krisevers14@gmail.com">email</a>
+      <a href="https://github.com/krisevers">github</a>
+      <a href="https://orcid.org/0000-0002-3386-1259">orcid</a>
+    </footer>
+  </body>
+</html>

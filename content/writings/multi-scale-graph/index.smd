@@ -1,0 +1,209 @@
+---
+.title = "Representing Multi-Scale Systems using Directed Acyclic Graphs",
+.date = @date("2025-08-07T00:00:00"),
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = false,
+---
+
+Say you want to build a model of biological tissue (e.g. muscle or hearth tissue) using a set of cells which all have their own position variables. The straight forward way of modelling this is by placing all variables in a continuous array.
+```zig
+const Position = struct { x : i32, y : i32, z : i32 };
+const positions = [_]Position ** 1000;
+```
+The indices into this array are the handles to a cell in the model, assuming you don't shuffle the order of the position data. The moment you want to subdivide a tissue into two or more specific specialized tissues you could just get slices into the array to obtain all positions belonging to one of the tissues:
+```zig
+const muscle_tissue = positions[0..500];
+const heart_tissue = positions[500..1000];
+```
+This approach to organizing your models works well if all your components operate at the same scale. Model components have a one-to-one relationship and the memory layout is cache-friendly in well suited for SIMD (Single Input, Multiple Data) optimization.
+
+But what if there is no one-to-one relation between model components? Such a situation occurs when there are components at different scales which dependent on each other. For example, when computing the mean fiber orientation from the positions in `muscle_tissue`, or when global tissue stress influences individual cell behavior. Ofcourse you could just create a new variable which stores the global variables representing the fiber properties:
+```zig
+const Fiber = struct { pos : Position, orientation: f32, tension: f32 };
+```
+but the moment you want to extend your model to include more muscle, diversify the tissue, or add even more scales at the top or bottom you run will end up creating a spagetti of dependencies between variables which quickly will become unmanagable. If you are not careful the indices become unstable handles to the data, and adding new components or scales requires extensive refactoring. Using a basic slicing method becomes unmanagable for any model with more than two layers of hierarchy. To prevent running into such problems we need a data structure which makes the hierarchical, multi-scale relationships explicit.
+
+## Variables, Collections and Components
+Inspired by component system architectures I use integer handles to represent both variables (e.g. a position, a velocity, a membrane potential) and collections of variables (e.g. a cell, a membrane, a muscle) using unique integer based IDs. Using such handles, defining a model becomes a question of moving around such IDs and writing functionality to make it this an easy process. This way we separate the actual allocation of the model data from the model design. Scientists think in terms of cells, tissues, organs, and ecosystems - not of memory adresses and SIMD registers. Humans tend to model systems as they appear in nature, with clear physical boundaries and dynamics that depend only on local neighborhoods. However, computers excel at performing similar operations in bulk, especially when data is aligned for SIMD operations. Traditional approaches often sacrifice readability and extensibility for performance, forcing researchers to re-optimize their code whenever the model changes. By abstracting the model structure, researchers can focus on implementing the dynamics of individual systems while maintaining a flexible, human-readable way to define the model and its component relationships.
+
+> The remainder of this post explores a possible implementation of such a component based system. Code blocks are written in the `zig` language, so don't forget to `const std = @import("std");`. However, the concepts discussed are general and translates to any systems programming language.
+
+Generating unique IDs could be done with a simple pattern:
+```zig
+fn genID() usize {
+    const S = struct {
+        var uid: std.atomic.Value(usize) = std.atomic.Value(usize).init(0);
+    };
+    return S.uid.fetchAdd(1, .monotonic);
+}
+```
+`uid` increments atomically each time `genID()` is called ensuring unique IDs.
+Component specific information can then be kept using arrays of `enums`:
+```zig
+const ComponentType enum {
+    Inactive,
+    Variable,
+    Parameter,
+    Collection,
+};
+```
+Now we have a way of creating model components by generating unique IDs.
+```zig
+test "create components" {
+    const capacity: usize = 10; // max number of components
+    const components: [_]ComponentType{Componenttype.Inactive} ** capacity;
+
+    const x = genID();
+    const y = genID();
+    const z = genID();
+
+    // position
+    components[x] = ComponentType.Variable;
+    components[y] = ComponentType.Variable;
+    components[z] = ComponentType.Variable;
+
+    try expect(x == 0);
+    try expect(y == 1);
+    try expect(z == 2);
+}
+```
+
+## The Multi-Scale Graph
+The second part of the data structure is a graph which handles relationships between components (i.e. IDs). To build such associations we need a container to store these relations, an adjacency matrix (`relations`). For convenience we store the components and relations in a `register`.
+```zig
+    const Registry = struct {
+        components: []ComponentType;
+        relations: [][]i32;
+        size: usize;
+        capacity: usize;
+        allocator: std.mem.Allocator,
+
+        const Self = @This();
+
+        pub fn init(allocator: std.mem.Allocator, capacity: usize) !Self {
+            const components = try allocator.alloc(ComponentType, capacity);
+            @memset(components, ComponentType.Inactive);
+
+            const relations = try allocator.alloc([]i32, capacity);
+            for (relations) |*row| {
+                row.* = try allocator.alloc(i32, capacity);
+                @memset(row.*, 0);
+            }
+
+            return Self{
+                .components = components,
+                .relations  = relations,
+                .size = 0,
+                .capacity = capacity,
+                .allocator = allocator,
+            }
+        }
+
+        pub fn has(self: *const Self, id: usize) bool {
+            return id < capacity && components[id] != ComponentType.Inactive;
+        }
+
+        pub fn add(self: *Self, ctype: ComponentType) usize {
+            const id = genID();
+            if (id >= self.capacity) {
+                // out of bounds
+            }
+            self.components[id] = ctype;
+            self.size += 1;
+            return id;
+        }
+    }
+```
+Each component can parent a _child_ component as long as the _child_ component is not already a parent of the _parent_ or is down stream in the ancestry-tree of the _child_. This ensures the acyclic property and enforces the hierarchical nature of the graph. Multi-scale models often have a hierarchical tree like structure in which components at a higher abstraction level contain many similar components at a lower abstraction level. Therefore the directed acyclic graph structure is ideal to represent such an architecture. We can provide easy to use functionality to build up the graph by providing the `give` and `assemble` functions below.
+```zig
+pub fn give(reg: *Registry, parent: usize, child: usize, copies: i32) bool {
+    if (!reg.has(parent)) {
+        return false;
+    }
+    if (!reg.has(child)) {
+        return false;
+    }
+    if (!hasParentInAncestry(reg, parent, child)) {
+        return false;
+    }
+    reg.relations[parent, child] = copies;
+    return true;
+};
+
+pub fn assemble(reg: *Registry, children: []const usize, copies: i32) !usize {
+    parent = reg.add(Collection);
+    for (children) |child| {
+        if (!give(reg, parent, child, copies)) {
+            return error.InvalidConnection;
+        }
+    }
+    return parent;
+}
+```
+As one can see we need some additional functionality to get a valid registration of relations between components. By valid I mean we would not want circular relations between components. For example, we would like to make a `leaf` and a `root` children of a `tree`, but then it should be prevented to make `tree` a child of `root`.
+```zig
+test "give components" {
+
+    Registry reg;
+    reg.capacity = 2;
+    tree = reg.add(Variable);
+    leaf = reg.add(Variable);
+    root = reg.add(Variable);
+
+    try expect(give(reg, tree, root, 50));
+    try expect(give(reg, root, tree, 1));   // should fail because we already made tree a parent of root.
+}
+```
+We write the functions `isDescendent` and `hasParentInAncestry` to find out if the requested relation is valid:
+```zig
+fn isDescendant(reg: *const Registry, ancestor: usize, node: usize) bool {
+    if (ancestor == node) return true;
+
+    // Check all children of ancestor
+    for (0..reg.capacity) |child| {
+        if (reg.relations[ancestor][child] > 0) {
+            if (isDescendant(reg, child, node)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+fn hasParentInAncestry(reg: *const Registry, potential_parent: usize, potential_child: usize) bool {
+    // Check if potential_parent is already downstream from potential_child
+    return isDescendant(reg, potential_child, potential_parent);
+}
+```
+With minimalistic interface in place it is fairly straighforward to create complex model structures. Let's build up a system of muscle fibers in a flexible way with the above defined graph. We will give all components a position in three dimensions, a cells get a velocity component, and fibers an orientation and tension component. Each fiber consists of 10e5 cells, and we have 42 fibers in total, constituting the muscle tissue:
+```zig
+test "build a fiber model" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator;
+
+    var r = try Registry.init(allocator, 100);
+
+    const x = r.add(ComponentType.Variable);
+    const y = r.add(ComponentType.Variable);
+    const z = r.add(ComponentType.Variable);
+    const position = assemble(r, [x, y, z], 1);
+    const dx = r.add(ComponentType.Variable);
+    const dy = r.add(ComponentType.Variable);
+    const dz = r.add(ComponentType.Variable);
+    const velocity = assemble(r, [x, y, z], 1);
+
+    const cell = assemble(r, [position, velocity], 1);
+    const fiber = assemble(r, [position, cell], 10e5);
+    const muscle = assemble(r, [position, fiber], 42);
+}
+```
+We now track all model components using unique IDs (e.g. `x`, `cell`, `fiber`, `muscle`) which function as flexible building blocks of the model. Now we have an interface for building models in the language of natural hierarchies. The directed acyclic graph holds all information on the relations between components, how many allocations should be made of each component and essentially where one should look to find a particular data point belonging to a specific part of the model.
+
+We have not allocated any data components yet. In a next article I will describe how allocation can be done with SIMD operations in mind, and implement a `view` interface to expose the subsets of the data using the graph for specific computations on parts of the data.

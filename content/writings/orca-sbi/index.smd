@@ -1,0 +1,64 @@
+---
+.title = "A Python tool for Streamlining Parameter Search in Computational Biology",
+.date = @date("2023-09-03T00:00:00"),
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = false,
+---
+
+From experience I know that it is a bit of a hassle to explore the parameter space of simulators. You might have several sub-models or post-processing steps which depend on each other. A tool like [Snakemake](https://snakemake.readthedocs.io/en/stable/) might help solve this issue, but it is not that straightforward to develop a Snakefile for your needs. Creating a `Snakefile` pipeline takes a bit of practise. Then there is [Code Ocean](https://codeocean.com/) which provides great tools for developing pipelines with a nice interactive visual design. The big disadvantage that it is not open-source and you need a subscription to make use of their tools.
+
+I wanted a tool which made it easy to generate data from simulators and be able to directly perform training and inference on the parameter space. Because I couldn't find a open-source tool that suited my needs I started developing my own tool: [`orca`](https://github.com/krisevers/orca). It is a small Python library which generates `json` files in which the flow of the data is defined. There is a single file where the prior distributions of the parameter space are defined (`prior.json`). After the pipeline is defined, the file `orca.json` contains all information about what commands will be executed and in what order.
+
+I have incorporated the methods to perform training and inference on the simulation results directly within `orca`. This means that the output data can directly be used to train neural density estimators which can predict parameters given some observational data (simulation based inference).
+
+In the next iteration of this project I will implement automatic generation of `Snakefile` pipelines, to get the advantages that Snakemake offers (containerization, etc.) while keeping the utility of this project (i.e. training and inference).
+
+---
+
+A simple working example is given with a simple Lorenz system connected to an observation model which computes the cross-correlation between the simulated variables.
+
+A prior file can be created by running:
+
+```python
+from orca import prior
+
+set_prior('prior.json', 'Lorenz', 'sigma', 'uniform', low=0, high=20)
+set_prior('prior.json', 'Lorenz', 'rho',   'uniform', low=0, high=50)
+set_prior('prior.json', 'Lorenz', 'beta',  'uniform', low=0, high=10)
+```
+
+The Orca class can be called, and models can be appended and run. The following shows a simple workflow for loading models, appending them to the Orca object, and running using the prior file created above:
+
+```python
+from orca import Orca
+from examples.lorenz import Lorenz, CrossCorr
+
+# create the orca object
+O = Orca(num_simulations=100)
+
+# create the model objects (these should have a call function)
+L = Lorenz()
+C = CrossCorr()
+
+# Append the models to the orca object in the right order (such that output of L is the input of C)
+O.append(L)
+O.append(C)
+
+# run the simulations
+psi, theta = O.run('prior.json')
+
+# print a summary of the orca object
+O()
+```
+
+### Notes
+- The repository can be found here: [github.com/krisevers/orca](https://www.github.com/krisevers/orca)
+- The original goal of this project was to automate `Snakefile` generation. This will be implemented next.
+- Code Ocean and Snakemake allow for containerization of the pipeline; an example showing how to do this with `orca` will be included next.
+- This project is in the first place created to make my own life easier, therefore it has not been thoroughly tested on a wide range of problems.
