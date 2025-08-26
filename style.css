@@ -19,11 +19,8 @@ h3:hover {
 
 b,
 strong {
-    color: #cc0000;
-    font-family:
-        URW Chancery L,
-        cursive;
-    font-size: 1.5em;
+    color: red;
+    font-size: 1em;
     font-weight: 1;
 }
 
