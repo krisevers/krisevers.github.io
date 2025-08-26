@@ -3,83 +3,131 @@ h2,
 h3,
 h4,
 h5 {
-  color: #ddd;
-  font-family: "Verdana", sans-serif;
+    color: forestgreen;
+    font-family: "Mono", sans-serif;
+    line-height: 35px;
+    font-weight: 1;
+}
+
+h3 {
+    color: #030d03;
+}
+
+h3:hover {
+    color: forestgreen;
 }
 
 b,
 strong {
-  color: #fff;
+    color: #cc0000;
+    font-family:
+        URW Chancery L,
+        cursive;
+    font-size: 1.5em;
+    font-weight: 1;
 }
 
 a {
-  color: #eee;
+    color: #444;
+    text-decoration: none;
+}
+
+a:hover {
+    color: forestgreen;
 }
 
 html {
-  color: #ccc;
-  font-family: "Georgia", serif;
-  font-size: 1.2em;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  background-color: #111;
+    color: #444;
+    font-family: "Mono", serif;
+    font-size: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    background-color: #e8f3e8;
+    line-height: 30px;
 }
 
 body {
-  width: 800px;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
+    width: min(800px, 100vw);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .site-title {
-  font-size: 2.5em;
-  margin-bottom: 10px;
-  /* text-align: center; */
+    font-size: 1em;
+    margin-bottom: 0px;
+    /*text-align: center;*/
 }
 
 nav {
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-  font-size: 1.2em;
-  margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    font-size: 1em;
+    margin-bottom: 20px;
+}
+
+.container {
+    display: inline-flex;
+    gap: 20px;
+    margin: 10px;
 }
 
 .block {
-  border: 1px dotted white;
-  padding: 5px 15px;
-  margin: 0 10px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    border: 2px dashed forestgreen;
+    border-radius: 5px;
+    /*background-color: #d2e7d2;*/
+    padding: 15px 15px;
+    margin: 10 10px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .block h1 {
-  font-size: 1em;
-  text-align: center;
-  margin-bottom: 0;
+    font-size: 1em;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.block h3 {
+    color: #444;
+}
+
+.block li {
+    margin-left: 10px;
 }
 
 .small {
-  font-size: 0.8em;
+    font-size: 0.8em;
 }
 
 .wave {
-  background: #111;
-  color: #fff;
-  text-shadow: 1px 1px 10px #fff, 1px 1px 10px #ccc;
+    background: #111;
+    color: #444;
+    text-shadow:
+        1px 1px 10px #444,
+        1px 1px 10px #444;
 }
 
 footer {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 footer hr {
-  width: 100%;
+    width: 100%;
+    color: forestgreen;
+}
+
+img {
+    align-self: flex-start;
+    height: auto;
+    max-width: 100%;
+    margin-bottom: 10px;
 }
