@@ -1,0 +1,16 @@
+---
+.title = "Layered Structure of Cortex Explains Reversal Dynamics in Bistable Perception",
+.date = @date("2023-09-21T00:00:00"),
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = false,
+---
+**https://doi.org/10.1101/2023.09.19.558418**
+
+## Abstract
+Bistable perception involves the spontaneous alternation between two exclusive interpretations of a single stimulus. Previous research has suggested that this perceptual phenomenon results from winnerless dynamics in the cortex. Indeed, winnerless dynamics can explain many key behavioral characteristics of bistable perception. However, it fails to explain an increase in alternation rate that is typically observed in response to increased stimulus drive and instead predicts a decline in alternation rate. To reconcile this discrepancy, several lines of work have augmented winnerless dynamics with additional processes such as global gain control, input suppression, and release mechanisms. These offer potential explanations at an algorithmic level. But it remains unclear which, if any, of these mechanisms are implemented in the cortex and what their biological substrates might be. We show that the answers to these questions lie within the architecture of the cortical microcircuit. Utilizing a dynamic mean field approach, we implement a laminar columnar circuit with empirically derived interlaminar connectivity. By coupling two such circuits such that they exhibit competition, we are able to produce winnerless dynamics reflective of bistable perception. Within our model, we identify two mechanisms through which the layered structure of the cortex gives rise to increased alternation rate in response to increased stimulus drive. First, deep layers act to inhibit the upper layers, thereby reducing the attractor depth and increasing the alternation rate. Second, recurrent connections between superficial and granular layers implement an input suppression mechanism which again reduces the attractor depth of the winnerless competition. These findings demonstrate the functional significance of the layered cortical architecture as they showcase perceptual implications of neuroatomical properties such as interlaminar connectivity and layer-specific activation.

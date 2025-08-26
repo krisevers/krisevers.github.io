@@ -1,0 +1,7 @@
+---
+.title = "Publications",
+.date = @date("1990-01-01T00:00:00"),
+.author = "Kris Evers",
+.layout = "writings.shtml",
+.draft = false,
+---
