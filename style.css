@@ -63,8 +63,9 @@ body {
 
 nav {
     display: flex;
-    flex-direction: column;
-    justify-content: left;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 200px;
     font-size: 1em;
     margin-bottom: 20px;
 }
