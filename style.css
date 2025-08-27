@@ -40,12 +40,12 @@ a:hover {
 html {
     color: var(--text);
     font-family: "Mono", serif;
-    font-size: 1em;
+    font-size: 0.9em;
     display: flex;
     flex-direction: row;
     justify-content: center;
     background-color: var(--background);
-    line-height: 30px;
+    line-height: 25px;
 }
 
 body {
