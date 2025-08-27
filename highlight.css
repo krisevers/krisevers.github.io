@@ -1,11 +1,22 @@
+:root {
+    --block-background: #e8f4fb;
+    --text: #444;
+    --keyword: #125886;
+    --type: #1876b3;
+    --string: #e06a1e;
+    --constant: #e06a1e;
+    --function: #9c4a15;
+    --comment: #159c4a;
+}
+
 pre {
-    border-color: #030d03;
+    border-color: #444;
     border-style: solid;
     border-width: 1px;
     border-radius: 1px;
     padding: 15px 15px;
     margin: 0px;
-    background-color: #f3f9f3;
+    background-color: var(--block-background);
     font-size: 1.2em;
     text-wrap: wrap;
 }
@@ -14,20 +25,20 @@ code {
     color: #444;
 }
 code .keyword {
-    color: #1750eb;
+    color: var(--keyword);
 }
 code .type {
-    color: #0033b3;
+    color: var(--type);
 }
 code .string {
-    color: #0037a6;
+    color: var(--string);
 }
 code .numeric.constant {
-    color: #00aa00;
+    color: var(--constant);
 }
 code .function {
-    color: #00aaaa;
+    color: var(--function);
 }
 code .comment {
-    color: firebrick;
+    color: var(--comment);
 }
