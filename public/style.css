@@ -1,51 +1,55 @@
+:root {
+    --background: #e8f4fc;
+    --text: #444;
+    --header: #125886;
+    --hover: #e06a1e;
+    --strong: #1876b3;
+}
+
 h1,
 h2,
 h3,
 h4,
 h5 {
-    color: forestgreen;
+    color: var(--header);
     font-family: "Mono", sans-serif;
     line-height: 35px;
     font-weight: 1;
 }
 
-h3 {
-    color: #030d03;
-}
-
 h3:hover {
-    color: forestgreen;
+    color: var(--hover);
 }
 
 b,
 strong {
-    color: blue;
+    color: var(--strong);
     font-size: 1em;
     font-weight: 1;
 }
 
 a {
-    color: #444;
+    color: var(--text);
     text-decoration: none;
 }
 
 a:hover {
-    color: forestgreen;
+    color: var(--hover);
 }
 
 html {
-    color: #444;
+    color: var(--text);
     font-family: "Mono", serif;
     font-size: 1em;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    background-color: #e8f3e8;
+    background-color: var(--background);
     line-height: 30px;
 }
 
 body {
-    width: min(800px, 100vw);
+    width: min(800px, 90vw);
     padding: 15px;
     display: flex;
     flex-direction: column;
@@ -55,7 +59,6 @@ body {
 .site-title {
     font-size: 1em;
     margin-bottom: 0px;
-    /*text-align: center;*/
 }
 
 nav {
@@ -104,10 +107,10 @@ nav {
 
 .wave {
     background: #111;
-    color: #444;
+    color: var(--text);
     text-shadow:
-        1px 1px 10px #444,
-        1px 1px 10px #444;
+        1px 1px 10px var(--text),
+        1px 1px 10px var(--text);
 }
 
 footer {
@@ -119,7 +122,7 @@ footer {
 
 footer hr {
     width: 100%;
-    color: forestgreen;
+    color: var(--header);
 }
 
 img {
