@@ -17,7 +17,7 @@ Central to many questions in neuroscience is how signal changes relate to underl
 \psi = F_{\theta}(x)
 ```
 
-Where $F$ is conditioned on the free parameters ([`\theta`]($mathtex), e.g. connectivity), and [`x`]($mathtex) are the experimental factors such as stimulus onset and duration (i.e. parameters which are not of interest for inversion). Taking a set of samples from a prior distribution [`p(\theta)`]($mathtex) of the parameters of interest one can run a number of simulations ([`N`]($mathtex)) and obtain a dataset containing the instantiations of the parameters and the resulting observations ([`[\theta_i,\psi_i]_{i=1}^N`]($mathtex)). This dataset is then a set of samples taken from:
+Where [`F`]($mathtex) is conditioned on the free parameters ([`\theta`]($mathtex), e.g. connectivity), and [`x`]($mathtex) are the experimental factors such as stimulus onset and duration (i.e. parameters which are not of interest for inversion). Taking a set of samples from a prior distribution [`p(\theta)`]($mathtex) of the parameters of interest one can run a number of simulations ([`N`]($mathtex)) and obtain a dataset containing the instantiations of the parameters and the resulting observations ([`[\theta_i,\psi_i]_{i=1}^N`]($mathtex)). This dataset is then a set of samples taken from:
 
 ```=mathtex
 p(\theta,\psi)=p(\theta)p(\psi,\theta)

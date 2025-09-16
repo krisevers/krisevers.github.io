@@ -2,7 +2,18 @@
 <head id="head">
 </head>
 <body id="body">
-  <h1 :text="$page.title"></h1>
   <div :html="$page.content()"></div>
 
+  <hr>
+  <h2>Recent Posts</h2>
+  <ctx blog="$site.page('blog')">
+    <p :loop="$ctx.blog.subpages()">
+        <div class="card">
+            <a class="card-header" href="$loop.it.link()">
+                <div class="card-title" :text="$loop.it.title"></div>
+                <p class="card-subtitle" :text="$loop.it.date.format('January 02, 2006')"></p>
+            </a>
+        </div>
+    </p>
+  </ctx>
 </body>

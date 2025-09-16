@@ -1,0 +1,152 @@
+---
+.title = "Symbolic Expressions and Optimizing Systems of Equations",
+.date = @date("2025-09-03T00:00:00"),
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = true,
+---
+
+Using symbolic math expressions in code you can postpone the evaluation of an equation written in code. This way it is possible to capture the whole expression tree,
+the whole system of equations and analyze before execution what would be the best way to evaluate. In biophysics, many systems are serially dependent on each other, and
+many are not. Naïvely written a system of equations out in code might be suboptimal with respect to memory usage, and computatal complexity.
+For example, consider the simple system below:
+```=mathtex
+\frac{dx}{dt} = (a + x) + c(a + b)
+```
+```=mathtex
+\frac{dy}{dt} = ay + xy
+```
+We could just implement this system by writing out the equations as follows and get correct results.
+```c
+float dxdt = (a + x) + (a + b) * c;
+float dydt = a*y + x*y;
+```
+But can we do better?
+
+The first thing of note is that if `a`, `b`, and `c` are constants the expression `(a + b) * c` can be precomputed and used for each time step of simulation. This removes
+two operations per time step and can mean a lot for performance in larger systems. Furthermore, we can rewrite `a*x + x*y` and factor out `y` leaving us with
+`(a + x) * y`. We went from 3 to 2 operations. Again, if `x` and `y` are large vectors this can be a significant improvement. These optimalizations within each equations
+might be captured by a compiler, but we can go further if we consider the system as a whole (why we need to capture it symbolically!).
+After the last rewrite of `dydt` we can observe that in both equations we have the term `(a + x)`. It would be a waste to compute this term twice each iteration of the
+simulation. Precomputing all structures that repeat across the whole system and the constants can significantly reduce the number of operations required at each time
+step:
+```c
+float tmp1 = (a + b) * c;   // outside of the critical loop;
+float tmp2 = a + x;
+float dxdt = tmp2 + tmp1;
+float dydt = tmp2 * y;
+```
+We have reduced the number iterated operations from 7 to 3, that is a theoretical 57% speedup.
+Now we can do this by hand for such a small system, but how about larger systems of equations with many more dependencies? How can we automate this for larger systems, and how far can we push this technique?
+
+
+## The Expression Tree
+Once we are able to capture the terms as symbolic expressions we can build a computational graph from them in which nodes are leafs or operations and edges are dependencies.
+We have a few primitives which are enough to build up complex math expressions.
+
+[]($image.asset('expr_primitives.png'))
+
+A root or output variable holds up an expression tree, it sits are the end of the tree. Leafs
+can be variables and constants. A leaf in one tree can be a root in another tree. Operations sit between the leafs and the root making up the transformation. There are 2 types of
+primitive operations: unary operations which take a single term as input. Examples of unary operations are `sin()`, `cos()`, `neg()`. Binary operations take two nodes as input.
+Examples are `add()`, `mul()`, `pow()`. With these primitives we can express our system of equations as a computational graph:
+[]($image.asset('expr_naive.png'))
+Now this is the naïve graph, just taking the differential equations as they are and computing all blue and red nodes everytime we call the kernel. Now let's have a look what
+the optimized graph would look like:
+[]($image.asset('expr_opt.png'))
+Now we have only have 5 operations to perform instead of 7. 2 of these 5 operations can be computed once at the beginning of the simulation in `a`, `b` and `c` are all constants
+(or known for all time-points if they are time dependent). We would like to automate the process of going from the *naïve* graph to the *optimized* graph. To do this we could
+somehow detect symmetries in the *naïve* graph and decompose the graph into a set of subgraphs we could then re-arange to obtain the *optimized* graph.
+
+## Decomposing the Math
+To decompose the graph into subgraphs we should make a distinction between *structural equivalence* and *algebraic equivalence*. The first is similarity of a graph up to the leafs.
+Detecting structurally equivalent graphs will expose opportunities for parallel execution of the operations in these graphs (i.e. they are independent and composed of the same
+operations). *algebraic equivalence* is a stricter condition and means that two graphs are identical, including the leafs. They evaluate to the same result. If these are found the in a graph this means they can be
+precomputed once and used in both places. This will have the side effect that we have an extra memory allocation.
+
+Both the *naïve* and *optimized* graph are a directed-acyclic graph (DAG). To decompose DAGs and detect symmetries we can assign each node a unique identifier. A neat technique I
+found is to use a hash function. By computing hash values for each node in the graph structurally equivalent subgraphs will have the same hash.
+For example, `(a + b) * c` and `(x + y) * z` would end up having the same hash and are thus structurally equivalent. To implement this algorithm we create a way to store the symbolic nodes:
+```c
+typedef enum { VAR, CONST, ADD, MUL, SUB, DIV, SIN, COS } NodeType;
+
+typedef struct Expr {
+    NodeType type;
+
+    union {
+        uint8_t ID;                 // variables and constants
+        struct {                    // binary operations
+            struct Expr *left;
+            struct Expr *right;
+        };
+        struct Expr *operand;       // unary operations
+    };
+
+    uint64_t s_hash;                // structural hash
+    uint64_t a_hash;                // algebraic hash
+    int s_hash_computed;
+    int a_hash_computed;
+} Expr;
+```
+We can now for each expression node store a structural and an algebraic hash. To compute all hashes for an expression tree we first need a tree.
+We can use the following patterns to build variables and parameters, and binary and unary operations:
+```c
+Expr* var(uint8_t ID) {
+    Expr *node = malloc(sizeof(Expr));
+    node->type = VAR;   // or PAR
+    node->ID = ID;
+    return node;
+}
+
+Expr* add(Expr *left, Expr *right) {
+    Expr *node = malloc(sizeof(Expr));
+    node->type = ADD; // or MUL, SUB, DIV, ...
+    node->left = left;
+    node->right = right;
+    return node;
+}
+
+Expr* sin(Expr *operand) {
+    Expr *node = malloc(sizeof(Expr));
+    node->type = SIN; // or COS, ...
+    return node;
+}
+```
+Using such functions expression trees can be build symbolically. We want to find out which sub-graphs are structurally or algebraic equivalent.
+Let's build the graphs are depicted above:
+```c
+Expr* a = par(0);
+Expr* b = par(1);
+Expr* c = par(2);
+Expr* x = var(3);
+Expr* y = var(4);
+
+Expr* dxdt = add(add(a, x), mul(add(a, b), c));     // "(a + x) + (a + b) * c"
+Expr* dydt = add(mul(a, y), mul(x, y));             // "a*y + x*y"
+```
+Cool, we created a simple database of expressions and have decomposed the equations, now we can do with them whatever we want. The goal is to go from this naïve graph, to an optimized graph in which we have the
+least amount of operations, and are able to detect targets for parallelism.
+
+## Normalizing the System
+We would like to detect the expression `add(a, x)` in both equations `dxdt` and `dydt`. So we should do some pattern recognition and put all terms in a normalized form. There are a
+
+## Grouping and Sorting
+
+## Topological Sort
+
+## 2nd Order Runge-Kutta
+Consider the following 2nd order Runge-Kutta integrator.
+```=mathtex
+k_1 = f(t_n, y_n)
+```
+```=mathtex
+k_2 = f(t_n + \frac{2}{3}, y_n + \frac{2}{3} h k_1)
+```
+```=mathtex
+\frac{dy}{dt} = h (\frac{1}{4} k_1 + \frac{3}{4} k_2)
+```

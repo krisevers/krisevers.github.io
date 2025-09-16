@@ -19,12 +19,17 @@
   <h1 :text="$page.title"></h1>
   <div :html="$page.content()"></div>
   <div>
-    <!-- <h2>Post list</h2> -->
+     <!--<h2>Post list</h2>-->
     <div :loop="$page.subpages()">
-      <span class="date" :text="$loop.it.date.format('January 02, 2006')"></span>
-      <a class="title" href="$loop.it.link()">
-        <h3 :text="$loop.it.title"></h3>
-      </a>
+        <div class="card">
+            <a class="card-header" href="$loop.it.link()">
+                <h2 class="card-title" :text="$loop.it.title"></h2>
+                <p class="card-subtitle" :text="$loop.it.date.format('January 02, 2006')"></p>
+            </a>
+
+        </div>
     </div>
   </div>
+
+
 </body>

@@ -1,0 +1,34 @@
+---
+.title = "Parallelizing Runge-Kutta",
+.date = @date("2025-09-03T00:00:00"),
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = true,
+---
+Differential equations are often integrated with using one of the Runge-Kutta methods. The most well known version is the 4th order Runge-Kutta:
+```=mathtex
+y_{i+h} = y_i + \frac{h}{6} (k_1 + 2k_2 + 2k_3 + k_4)
+```
+```=mathtex
+t_{i+h} = t_i + h
+```
+Where [`h > 0`]($mathtex) is the step size and where the slopes are:
+```=mathtex
+k_1 = f(t_i, y_i)
+```
+```=mathtex
+k_2 = f(t_i + \frac{h}{2}, y_i + \frac{h k_1}{2})
+```
+```=mathtex
+k_3 = f(t_i + \frac{h}{2}, y_i + \frac{h k_2}{2})
+```
+```=mathtex
+k_4 = f(t_i + h, y_i + h k_3)
+```
+As one can see all these slopes are dependent on each other and for each time step we have to compute them in the fixed order: [`k_1 > k_2 > k_3 > k_4`]($mathtex). It seems like we are thus stuck with doing the
+whole integration sequentially and that will be how fast we will ever compute. However, we can do something neat, if we graphically represent the algorithm we

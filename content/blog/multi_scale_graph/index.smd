@@ -77,48 +77,48 @@ test "create components" {
 ## The Multi-Scale Graph
 The second part of the data structure is a graph which handles relationships between components (i.e. IDs). To build such associations we need a container to store these relations, an adjacency matrix (`relations`). For convenience we store the components and relations in a `register`.
 ```zig
-    const Registry = struct {
-        components: []ComponentType;
-        relations: [][]i32;
-        size: usize;
-        capacity: usize;
-        allocator: std.mem.Allocator,
+const Registry = struct {
+    components: []ComponentType;
+    relations: [][]i32;
+    size: usize;
+    capacity: usize;
+    allocator: std.mem.Allocator,
 
-        const Self = @This();
+    const Self = @This();
 
-        pub fn init(allocator: std.mem.Allocator, capacity: usize) !Self {
-            const components = try allocator.alloc(ComponentType, capacity);
-            @memset(components, ComponentType.Inactive);
+    pub fn init(allocator: std.mem.Allocator, capacity: usize) !Self {
+        const components = try allocator.alloc(ComponentType, capacity);
+        @memset(components, ComponentType.Inactive);
 
-            const relations = try allocator.alloc([]i32, capacity);
-            for (relations) |*row| {
-                row.* = try allocator.alloc(i32, capacity);
-                @memset(row.*, 0);
-            }
-
-            return Self{
-                .components = components,
-                .relations  = relations,
-                .size = 0,
-                .capacity = capacity,
-                .allocator = allocator,
-            }
+        const relations = try allocator.alloc([]i32, capacity);
+        for (relations) |*row| {
+            row.* = try allocator.alloc(i32, capacity);
+            @memset(row.*, 0);
         }
 
-        pub fn has(self: *const Self, id: usize) bool {
-            return id < capacity && components[id] != ComponentType.Inactive;
-        }
-
-        pub fn add(self: *Self, ctype: ComponentType) usize {
-            const id = genID();
-            if (id >= self.capacity) {
-                // out of bounds
-            }
-            self.components[id] = ctype;
-            self.size += 1;
-            return id;
+        return Self{
+            .components = components,
+            .relations  = relations,
+            .size = 0,
+            .capacity = capacity,
+            .allocator = allocator,
         }
     }
+
+    pub fn has(self: *const Self, id: usize) bool {
+        return id < capacity && components[id] != ComponentType.Inactive;
+    }
+
+    pub fn add(self: *Self, ctype: ComponentType) usize {
+        const id = genID();
+        if (id >= self.capacity) {
+            // out of bounds
+        }
+        self.components[id] = ctype;
+        self.size += 1;
+        return id;
+    }
+}
 ```
 Each component can parent a _child_ component as long as the _child_ component is not already a parent of the _parent_ or is down stream in the ancestry-tree of the _child_. This ensures the acyclic property and enforces the hierarchical nature of the graph. Multi-scale models often have a hierarchical tree like structure in which components at a higher abstraction level contain many similar components at a lower abstraction level. Therefore the directed acyclic graph structure is ideal to represent such an architecture. We can provide easy to use functionality to build up the graph by providing the `give` and `assemble` functions below.
 ```zig

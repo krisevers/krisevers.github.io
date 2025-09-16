@@ -3,28 +3,43 @@
   <head id="head">
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1">
-    <title :text="$site.title"></title>
-    <link type="text/css" rel="stylesheet" href="$site.asset('style.css').link()">
-    <link type="text/css" rel="stylesheet" href="$site.asset('highlight.css').link()">
+    <title>Kris Evers</title>
+    <link type="text/css" rel="stylesheet" href="/style.css">
+    <link type="text/css" rel="stylesheet" href="/highlight.css">
     <!-- mathtex -->
-    <link type="text/css" rel="stylesheet" href="$site.asset('Temml-Local.css').link()">
-    <script defer src="$site.asset('temml.min.js').link()"></script>
-    <script defer src="$site.asset('render-mathtex.js').link()"></script>
+    <link type="text/css" rel="stylesheet" href="/Temml-Local.css">
+    <script defer src="/temml.min.js"></script>
+    <script defer src="/render-mathtex.js"></script>
     <!-- /mathtex -->
-    <super>
+    
+  <style>
+    .date {
+      font-size: 0.9em;
+      text-align: center;
+    }
+    .title h3{
+      margin-top: 0;
+    }
+
+    figure {
+        align-self: center;
+        text-align: center;
+    }
+  </style>
+
   </head>
   <body id="body">
 
     <nav>
         <div class="nav-container">
-            <a class="nav-brand" :text="$site.title" href="$site.page('').link()"></a>
+            <a class="nav-brand" href="/">Kris Evers</a>
         </div>
         <div class="nav-container">
-            <a class="nav-item" href="$site.page('').link()">About</a>
-            <a class="nav-item" href="$site.page('blog').link()">Posts</a>
-            <a class="nav-item" href="$site.page('projects').link()">Projects</a>
-            <a class="nav-item" href="$site.page('publications').link()">Publications</a>
-            <a class="nav-item" href="$site.page('bookmarks').link()">Bookmarks</a>
+            <a class="nav-item" href="/">About</a>
+            <a class="nav-item" href="/blog/">Posts</a>
+            <a class="nav-item" href="/projects/">Projects</a>
+            <a class="nav-item" href="/publications/">Publications</a>
+            <a class="nav-item" href="/bookmarks/">Bookmarks</a>
             <div class="nav-item"></div>
         </div>
     </nav>
@@ -46,7 +61,16 @@
         </div>
     </card>-->
 
-    <super>
+    
+  <h1>Bookmarks</h1>
+  <div></div>
+  <div>
+     <!--<h2>Post list</h2>-->
+    <div></div>
+  </div>
+
+
+
     <footer>
       <hr>
       <h2>find me here:</h2>

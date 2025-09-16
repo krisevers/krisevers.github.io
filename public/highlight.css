@@ -1,28 +1,28 @@
 :root {
-    --block-background: #ffff;
-    --text: #444;
-    --keyword: #125886;
-    --type: #1876b3;
+    --block-background: #fff;
+    --text: #073429;
+    --keyword: #007aff;
+    --type: #363b8f;
     --string: #e06a1e;
     --constant: #e06a1e;
-    --function: #9c4a15;
+    --function: #e20a39;
     --comment: #159c4a;
 }
 
 pre {
-    border-color: #444;
-    border-style: solid;
-    border-width: 1px;
-    border-radius: 1px;
-    padding: 15px 15px;
-    margin: 0px;
+    border: 2px solid var(--text);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px 15px;
+    margin: 0 auto 40px;
     background-color: var(--block-background);
-    font-size: 1.2em;
     text-wrap: wrap;
+    max-width: 100%;
+    margin-bottom: 10px;
 }
 
 code {
-    color: #444;
+    color: var(--text);
+    font-size: 1.3em;
 }
 code .keyword {
     color: var(--keyword);

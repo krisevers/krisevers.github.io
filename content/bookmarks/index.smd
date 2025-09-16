@@ -1,5 +1,5 @@
 ---
-.title = "Posts",
+.title = "Bookmarks",
 .date = @date("1990-01-01T00:00:00"),
 .author = "Kris Evers",
 .layout = "writings.shtml",
