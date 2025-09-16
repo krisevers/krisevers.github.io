@@ -24,8 +24,7 @@
             <a class="nav-item" href="$site.page('blog').link()">Posts</a>
             <a class="nav-item" href="$site.page('projects').link()">Projects</a>
             <a class="nav-item" href="$site.page('publications').link()">Publications</a>
-            <a class="nav-item" href="$site.page('bookmarks').link()">Bookmarks</a>
-            <div class="nav-item"></div>
+            <a class="nav-item nav-item-last" href="$site.page('bookmarks').link()">Bookmarks</a>
         </div>
     </nav>
 
