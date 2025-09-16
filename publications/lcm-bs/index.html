@@ -29,27 +29,54 @@
 
   </head>
   <body id="body">
-    <h1 class="site-title">Kris Evers</h1>
+
     <nav>
-      <a href="/">About</a>
-      <a href="/blog/">Blog</a>
-      <a href="/publications/">Publications</a>
+        <div class="nav-container">
+            <a class="nav-brand" href="/">Kris Evers</a>
+        </div>
+        <div class="nav-container">
+            <a class="nav-item" href="/">About</a>
+            <a class="nav-item" href="/blog/">Posts</a>
+            <a class="nav-item" href="/projects/">Projects</a>
+            <a class="nav-item" href="/publications/">Publications</a>
+            <a class="nav-item" href="/bookmarks/">Bookmarks</a>
+            <div class="nav-item"></div>
+        </div>
     </nav>
+
+    <!--<card>
+        <a class="card-header" href="$site.page('').link()">
+            <h2 class="card-title">Hello</h2>
+            <p class="card-subtitle">date</p>
+        </a>
+
+        <div class="card-body">
+            <p class="card-excerpt">
+                some short text introducing the article.
+            </p>
+        </div>
+        <div class="card-actions">
+            <span class="tag">zig</span>
+            <span class="tag">systems biology</span>
+        </div>
+    </card>-->
+
     
   <span class="date">September 21, 2023</span>
   <h1>Layered Structure of Cortex Explains Reversal Dynamics in Bistable Perception</h1>
   <div><p><strong><a href="https://doi.org/10.1101/2023.09.19.558418" target="_blank">https://doi.org/10.1101/2023.09.19.558418</a></strong></p><h2>Abstract</h2><p>Bistable perception involves the spontaneous alternation between two exclusive interpretations of a single stimulus. Previous research has suggested that this perceptual phenomenon results from winnerless dynamics in the cortex. Indeed, winnerless dynamics can explain many key behavioral characteristics of bistable perception. However, it fails to explain an increase in alternation rate that is typically observed in response to increased stimulus drive and instead predicts a decline in alternation rate. To reconcile this discrepancy, several lines of work have augmented winnerless dynamics with additional processes such as global gain control, input suppression, and release mechanisms. These offer potential explanations at an algorithmic level. But it remains unclear which, if any, of these mechanisms are implemented in the cortex and what their biological substrates might be. We show that the answers to these questions lie within the architecture of the cortical microcircuit. Utilizing a dynamic mean field approach, we implement a laminar columnar circuit with empirically derived interlaminar connectivity. By coupling two such circuits such that they exhibit competition, we are able to produce winnerless dynamics reflective of bistable perception. Within our model, we identify two mechanisms through which the layered structure of the cortex gives rise to increased alternation rate in response to increased stimulus drive. First, deep layers act to inhibit the upper layers, thereby reducing the attractor depth and increasing the alternation rate. Second, recurrent connections between superficial and granular layers implement an input suppression mechanism which again reduces the attractor depth of the winnerless competition. These findings demonstrate the functional significance of the layered cortical architecture as they showcase perceptual implications of neuroatomical properties such as interlaminar connectivity and layer-specific activation.</p></div>
   <div>
-    <!-- <h2>Post list</h2> -->
+     <!--<h2>Post list</h2>-->
     <div></div>
   </div>
 
     <footer>
       <hr>
-      <h3>find me here:</h3>
-      <a href="krisevers14@gmail.com">email: krisevers14@gmail.com</a>
-      <a href="https://github.com/krisevers">github: github.com/krisevers</a>
-      <a href="https://orcid.org/0000-0002-3386-1259">orcid: https://orcid.org/0000-0002-3386-1259</a>
+      <h2>find me here:</h2>
+      <a class="link" href="krisevers14@gmail.com">email: krisevers14@gmail.com</a>
+      <a class="link" href="https://github.com/krisevers">github: github.com/krisevers</a>
+      <a class="link" href="https://orcid.org/0000-0002-3386-1259">orcid: https://orcid.org/0000-0002-3386-1259</a>
     </footer>
+
   </body>
 </html>

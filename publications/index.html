@@ -29,36 +29,71 @@
 
   </head>
   <body id="body">
-    <h1 class="site-title">Kris Evers</h1>
+
     <nav>
-      <a href="/">About</a>
-      <a href="/blog/">Blog</a>
-      <a href="/publications/">Publications</a>
+        <div class="nav-container">
+            <a class="nav-brand" href="/">Kris Evers</a>
+        </div>
+        <div class="nav-container">
+            <a class="nav-item" href="/">About</a>
+            <a class="nav-item" href="/blog/">Posts</a>
+            <a class="nav-item" href="/projects/">Projects</a>
+            <a class="nav-item" href="/publications/">Publications</a>
+            <a class="nav-item" href="/bookmarks/">Bookmarks</a>
+            <div class="nav-item"></div>
+        </div>
     </nav>
+
+    <!--<card>
+        <a class="card-header" href="$site.page('').link()">
+            <h2 class="card-title">Hello</h2>
+            <p class="card-subtitle">date</p>
+        </a>
+
+        <div class="card-body">
+            <p class="card-excerpt">
+                some short text introducing the article.
+            </p>
+        </div>
+        <div class="card-actions">
+            <span class="tag">zig</span>
+            <span class="tag">systems biology</span>
+        </div>
+    </card>-->
+
     
   <h1>Publications</h1>
   <div></div>
   <div>
-    <!-- <h2>Post list</h2> -->
+     <!--<h2>Post list</h2>-->
     <div>
-      <span class="date">September 21, 2023</span>
-      <a class="title" href="/publications/lcm-bs/">
-        <h3>Layered Structure of Cortex Explains Reversal Dynamics in Bistable Perception</h3>
-      </a>
+        <div class="card">
+            <a class="card-header" href="/publications/lcm-bs/">
+                <h2 class="card-title">Layered Structure of Cortex Explains Reversal Dynamics in Bistable Perception</h2>
+                <p class="card-subtitle">September 21, 2023</p>
+            </a>
+
+        </div>
     
-      <span class="date">July 29, 2021</span>
-      <a class="title" href="/publications/onlaf/">
-        <h3>Cortical Synchrony as a Mechanism of Collinear Facillitation and Suppression in Early Visual Cortex</h3>
-      </a>
+        <div class="card">
+            <a class="card-header" href="/publications/onlaf/">
+                <h2 class="card-title">Cortical Synchrony as a Mechanism of Collinear Facillitation and Suppression in Early Visual Cortex</h2>
+                <p class="card-subtitle">July 29, 2021</p>
+            </a>
+
+        </div>
     </div>
   </div>
 
+
+
     <footer>
       <hr>
-      <h3>find me here:</h3>
-      <a href="krisevers14@gmail.com">email: krisevers14@gmail.com</a>
-      <a href="https://github.com/krisevers">github: github.com/krisevers</a>
-      <a href="https://orcid.org/0000-0002-3386-1259">orcid: https://orcid.org/0000-0002-3386-1259</a>
+      <h2>find me here:</h2>
+      <a class="link" href="krisevers14@gmail.com">email: krisevers14@gmail.com</a>
+      <a class="link" href="https://github.com/krisevers">github: github.com/krisevers</a>
+      <a class="link" href="https://orcid.org/0000-0002-3386-1259">orcid: https://orcid.org/0000-0002-3386-1259</a>
     </footer>
+
   </body>
 </html>
