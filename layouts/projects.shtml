@@ -1,14 +1,6 @@
 <extend template="base.shtml">
 <head id="head">
   <style>
-    .date {
-      font-size: 0.9em;
-      text-align: center;
-    }
-    .title h3{
-      margin-top: 0;
-    }
-
     figure {
         align-self: center;
         text-align: center;
@@ -18,17 +10,76 @@
 <body id="body">
   <h1 :text="$page.title"></h1>
   <div :html="$page.content()"></div>
-  <div>
-     <!--<h2>Post list</h2>-->
-    <div :loop="$page.subpages()">
-        <div class="card">
-            <a class="card-header" href="$loop.it.link()">
-                <h2 class="card-title" :text="$loop.it.title"></h2>
-                <p class="card-date" :text="$loop.it.date.format('January 02, 2006')"></p>
-            </a>
 
-        </div>
-    </div>
+
+  <div class="project">
+      <img class="project-image" src="$page.asset('hpcn.jpg').link()">
+      <div class="project-detail">
+          <div class="project-title">HPC Notes</div>
+          <div class="project-desc">
+              Notes on high-performance computing.
+              Includes best practices, software installation procedures, and workflows.
+          </div>
+      </div>
+
+      <div class="project-inset">
+          <div class="project-inset-left">
+              WIP
+          </div>
+          <div class="project-inset-right">
+              Github
+          </div>
+      </div>
+
+  </div>
+
+
+  <div class="project">
+      <img class="project-image" src="$page.asset('hpcn.jpg').link()">
+      <div class="project-detail">
+          <div class="project-title">tall</div>
+      </div>
+
+      <div class="project-inset">
+          <div class="project-inset-left">
+              WIP
+          </div>
+          <div class="project-inset-right">
+              Github
+          </div>
+      </div>
+  </div>
+
+  <div class="project">
+      <img class="project-image" src="$page.asset('hpcn.jpg').link()">
+      <div class="project-detail">
+          <div class="project-title">ONLAF</div>
+      </div>
+
+      <div class="project-inset">
+          <div class="project-inset-left">
+              Finished
+          </div>
+          <div class="project-inset-right">
+              Github
+          </div>
+      </div>
+  </div>
+
+  <div class="project">
+      <img class="project-image" src="$page.asset('hpcn.jpg').link()">
+      <div class="project-detail">
+          <div class="project-title">LCM-BS</div>
+      </div>
+
+      <div class="project-inset">
+          <div class="project-inset-left">
+              Finished
+          </div>
+          <div class="project-inset-right">
+              Github
+          </div>
+      </div>
   </div>
 
 

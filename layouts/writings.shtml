@@ -1,19 +1,5 @@
 <extend template="base.shtml">
 <head id="head">
-  <style>
-    .date {
-      font-size: 0.9em;
-      text-align: center;
-    }
-    .title h3{
-      margin-top: 0;
-    }
-
-    figure {
-        align-self: center;
-        text-align: center;
-    }
-  </style>
 </head>
 <body id="body">
   <h1 :text="$page.title"></h1>
@@ -26,6 +12,16 @@
                 <h2 class="card-title" :text="$loop.it.title"></h2>
                 <p class="card-date" :text="$loop.it.date.format('January 02, 2006')"></p>
             </a>
+
+            <div class="card-body">
+                <div class="card-excerpt" :text="$loop.it.description"></div>
+            </div>
+
+            <div class="card-actions">
+                <div class="card-tags" :loop="$loop.it.tags">
+                    <div class="card-tag" :text="$loop.it"></div>
+                </div>
+            </div>
 
         </div>
     </div>

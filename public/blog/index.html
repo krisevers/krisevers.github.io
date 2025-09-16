@@ -12,20 +12,6 @@
     <script defer src="/render-mathtex.js"></script>
     <!-- /mathtex -->
     
-  <style>
-    .date {
-      font-size: 0.9em;
-      text-align: center;
-    }
-    .title h3{
-      margin-top: 0;
-    }
-
-    figure {
-        align-self: center;
-        text-align: center;
-    }
-  </style>
 
   </head>
   <body id="body">
@@ -37,7 +23,7 @@
         <div class="nav-container">
             <a class="nav-item" href="/">About</a>
             <a class="nav-item" href="/blog/">Posts</a>
-            <a class="nav-item" href="/projects/">Projects</a>
+            <!--<a class="nav-item" href="$site.page('projects').link()">Projects</a>-->
             <a class="nav-item" href="/publications/">Publications</a>
             <a class="nav-item nav-item-last" href="/bookmarks/">Bookmarks</a>
         </div>
@@ -55,6 +41,18 @@
                 <p class="card-date">August 07, 2025</p>
             </a>
 
+            <div class="card-body">
+                <div class="card-excerpt">Implementation of a data-oriented data structure: a directed acyclic graph. The data structure can be used to build large systems of many hierarchically related components while keeping cache-friendly memory allocations.</div>
+            </div>
+
+            <div class="card-actions">
+                <div class="card-tags">
+                    <div class="card-tag">idea</div>
+                
+                    <div class="card-tag">zig</div>
+                </div>
+            </div>
+
         </div>
     
         <div class="card">
@@ -62,6 +60,18 @@
                 <h2 class="card-title">Data-Oriented Design for Biophysics</h2>
                 <p class="card-date">February 25, 2025</p>
             </a>
+
+            <div class="card-body">
+                <div class="card-excerpt">Data oriented programming principles are good practise in software development. Here I set out to describe how such principles could aid in building better models, with a particular focus on my own field: biophysics.</div>
+            </div>
+
+            <div class="card-actions">
+                <div class="card-tags">
+                    <div class="card-tag">idea</div>
+                
+                    <div class="card-tag">essay</div>
+                </div>
+            </div>
 
         </div>
     
@@ -71,6 +81,20 @@
                 <p class="card-date">May 25, 2024</p>
             </a>
 
+            <div class="card-body">
+                <div class="card-excerpt">Short introduction and walkthrough on how to use simulation based inference with an example using the Lorenz system.</div>
+            </div>
+
+            <div class="card-actions">
+                <div class="card-tags">
+                    <div class="card-tag">showcase</div>
+                
+                    <div class="card-tag">inference</div>
+                
+                    <div class="card-tag">python</div>
+                </div>
+            </div>
+
         </div>
     
         <div class="card">
@@ -78,6 +102,22 @@
                 <h2 class="card-title">A Python tool for Streamlining Parameter Search in Computational Biology</h2>
                 <p class="card-date">September 03, 2023</p>
             </a>
+
+            <div class="card-body">
+                <div class="card-excerpt">Orca provides tools for sequentially running generative models to obtain a well organized dataset of parameters and their associated observables from model simulations.</div>
+            </div>
+
+            <div class="card-actions">
+                <div class="card-tags">
+                    <div class="card-tag">showcase</div>
+                
+                    <div class="card-tag">inference</div>
+                
+                    <div class="card-tag">Python</div>
+                
+                    <div class="card-tag">SnakeMake</div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -90,7 +130,7 @@
       <h2>find me here:</h2>
       <a class="link" href="krisevers14@gmail.com">email: krisevers14@gmail.com</a>
       <a class="link" href="https://github.com/krisevers">github: github.com/krisevers</a>
-      <a class="link" href="https://orcid.org/0000-0002-3386-1259">orcid: https://orcid.org/0000-0002-3386-1259</a>
+      <a class="link" href="https://orcid.org/0000-0002-3386-1259">publications : https://orcid.org/0000-0002-3386-1259</a>
     </footer>
 
   </body>

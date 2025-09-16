@@ -2,12 +2,13 @@
 <head id="head">
   <style>
     .date {
-      font-size: 0.9em;
+      margin-top: 15px;
       text-align: center;
     }
     .title h3{
       margin-top: 0;
     }
+
 
     figure {
         align-self: center;

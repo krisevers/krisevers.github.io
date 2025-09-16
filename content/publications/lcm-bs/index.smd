@@ -1,6 +1,8 @@
 ---
 .title = "Layered Structure of Cortex Explains Reversal Dynamics in Bistable Perception",
 .date = @date("2023-09-21T00:00:00"),
+.description = "We show that the layered architecture of cortical microcircuits can explain bistable perception through winnerless dynamics, where deep layers inhibit upper layers and recurrent connections between superficial and granular layers implement input suppression, both reducing attractor depth and increasing alternation rates with stronger stimulus drive.",
+.tags = ["bistable dynamics", "cortical circuit"],
 .author = "Kris Evers",
 .layout = "blog.shtml",
 .alternatives = [{

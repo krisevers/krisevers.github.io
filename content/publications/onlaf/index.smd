@@ -1,6 +1,8 @@
 ---
 .title = "Cortical Synchrony as a Mechanism of Collinear Facillitation and Suppression in Early Visual Cortex",
 .date = @date("2021-07-29T00:00:00"),
+.description = "We propose that neural synchrony in visual cortex explains collinear facilitation and suppression effects, where flanking Gabor stimuli enhance or reduce target detectability through synchronized oscillations among neuronal populations with overlapping receptive fields.",
+.tags = ["oscillations", "kuramoto"],
 .author = "Kris Evers",
 .layout = "blog.shtml",
 .alternatives = [{

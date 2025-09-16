@@ -1,6 +1,8 @@
 ---
 .title = "Simulation Based Inference on the Lorenz System",
 .date = @date("2024-05-25T00:00:00"),
+.description = "Short introduction and walkthrough on how to use simulation based inference with an example using the Lorenz system.",
+.tags = ["showcase", "inference", "python"],
 .author = "Kris Evers",
 .layout = "blog.shtml",
 .alternatives = [{
