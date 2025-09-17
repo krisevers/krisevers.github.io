@@ -2,8 +2,12 @@
     --background: #fff7f4;
     --black: #000;
     --dark-blue: #363b8f;
-    --light-blue: #007aff;
+    --blue: #007aff;
+    --light-blue: #d8ebff;
+    --dark-red: #840621;
     --red: #e20a39;
+    --light-red: #fdc7d3;
+    --dark-orange: #dca511;
     --orange: #f4d06f;
     --light-orange: #f8df9e;
     --dark: #073429;
@@ -188,7 +192,7 @@ img {
     text-decoration: none;
     color: inherit;
     padding: 20px 24px 0px;
-    border-bottom: 2px solid var(--dark);
+    border-bottom: 4px solid var(--dark);
     transition: var(--orange) 0.2s ease;
     background-color: var(--orange);
 }
@@ -242,6 +246,7 @@ img {
     background-color: var(--light-grey);
     border-left: 2px solid var(--dark);
     border-top: 2px solid var(--dark);
+    border-bottom: 2px solid var(--dark);
 }
 
 .card-tag:hover {
@@ -255,33 +260,30 @@ img {
     height: 300px;
     margin: 15px auto;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border: 8px solid var(--dark-blue);
+    border: 8px solid;
     display: flex;
 }
 
-.project:nth-of-type(4n + 4) {
+.project:nth-of-type(3n + 1) {
     border-color: var(--dark-blue);
     background-color: var(--dark-blue);
     color: var(--background);
-    --special-color: var(--dark-blue);
+    --dark-color: var(--dark-blue);
+    --light-color: var(--light-blue);
 }
-.project:nth-of-type(4n + 1) {
-    border-color: var(--light-blue);
-    background-color: var(--light-blue);
-    color: var(--background);
-    --special-color: var(--light-blue);
-}
-.project:nth-of-type(4n + 2) {
+.project:nth-of-type(3n + 2) {
     border-color: var(--red);
     background-color: var(--red);
     color: var(--background);
-    --special-color: var(--red);
+    --dark-color: var(--red);
+    --light-color: var(--light-red);
 }
-.project:nth-of-type(4n + 3) {
-    border-color: var(--orange);
-    background-color: var(--orange);
-    color: var(--dark);
-    --special-color: var(--dark);
+.project:nth-of-type(3n + 3) {
+    border-color: var(--dark-orange);
+    background-color: var(--dark-orange);
+    color: var(--background);
+    --dark-color: var(--dark-orange);
+    --light-color: var(--light-orange);
 }
 
 .project-image {
@@ -289,6 +291,7 @@ img {
     width: 100%;
     height: inherit;
     object-fit: cover;
+    background-color: var(--light-color);
 }
 
 .project-detail {
@@ -296,25 +299,29 @@ img {
     bottom: 0;
     left: 0;
     right: 50%;
-    background-color: inherit;
+    background-color: var(--dark-color);
+    color: var(--light-color);
 }
 
 .project-title {
     font-size: 25px;
-    padding: 10px 10px 10px 10px;
+    font-weight: 1000;
+    margin: 10px;
 }
 
 .project-desc {
     font-size: 15px;
-    padding: 10px 10px 10px 10px;
+    border-top: 2px solid var(--light-color);
+    margin: 10px;
 }
 
 .project-inset {
     position: absolute;
     top: 10px;
-    /*left: 60%;*/
     right: 10px;
     background-color: inherit;
+    border: 1px solid var(--dark-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
     margin: 0 auto;
     display: flex;
@@ -322,17 +329,28 @@ img {
     align-items: center;
 }
 
+.project-inset:hover .project-inset-left {
+    color: var(--light-color);
+    background-color: var(--dark-color);
+}
+
+.project-inset:hover .project-inset-right {
+    color: var(--dark-color);
+    background-color: var(--light-color);
+}
+
 .project-inset-left {
     display: inline-block;
     padding: 5px 5px;
     margin: 5px 5px;
-    color: var(--special-color);
-    background-color: var(--background);
+    color: var(--dark-color);
+    background-color: var(--light-color);
 }
 
 .project-inset-right {
     display: inline-block;
     padding: 5px 5px;
     margin: 5px 5px;
-    background-color: inherit;
+    color: var(--light-color);
+    background-color: var(--dark-color);
 }
