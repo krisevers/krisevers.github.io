@@ -1,5 +1,5 @@
 ---
-.title = "Data-Oriented Design for Biophysics",
+.title = "Data-Oriented Design in Biology",
 .date = @date("2025-02-25T00:00:00"),
 .description = "Data oriented programming principles are good practise in software development. Here I set out to describe how such principles could aid in building better models, with a particular focus on my own field: biophysics.",
 .tags = ["idea", "essay"],

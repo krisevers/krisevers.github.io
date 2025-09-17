@@ -13,7 +13,7 @@
 
 
   <div class="project">
-      <img class="project-image" src="$page.asset('hpcn.jpg').link()">
+      <img class="project-image" src="$page.asset('hpcn.png').link()">
       <div class="project-detail">
           <div class="project-title">HPC Notes</div>
           <div class="project-desc">
@@ -22,48 +22,52 @@
           </div>
       </div>
 
-      <div class="project-inset">
+      <a class="project-inset" href="https://github.com/krisevers/hpcn">
           <div class="project-inset-left">
-              WIP
+              Work in Progress
           </div>
           <div class="project-inset-right">
               Github
           </div>
-      </div>
+      </a>
 
   </div>
 
 
   <div class="project">
-      <img class="project-image" src="$page.asset('hpcn.jpg').link()">
+      <img class="project-image" src="$page.asset('dodbio2.png').link()">
       <div class="project-detail">
           <div class="project-title">tall</div>
+          <div class="project-desc">
+              Framework for building multi-scale models.
+              Uses data-oriented design principles to allow scalable and performant implementation of complex models,
+              while keeping an easy to use interface.
+          </div>
       </div>
 
-      <div class="project-inset">
+      <a class="project-inset" href="https://github.com/krisevers/tall">
           <div class="project-inset-left">
-              WIP
+              Work in Progress
           </div>
           <div class="project-inset-right">
               Github
           </div>
-      </div>
+      </a>
   </div>
 
   <div class="project">
-      <img class="project-image" src="$page.asset('hpcn.jpg').link()">
+      <img class="project-image" src="$page.asset('onlaf.jpg').link()">
       <div class="project-detail">
           <div class="project-title">ONLAF</div>
+          <div class="project-desc">
+              Oscillator network local association field.
+          </div>
       </div>
 
-      <div class="project-inset">
-          <div class="project-inset-left">
-              Finished
-          </div>
-          <div class="project-inset-right">
-              Github
-          </div>
-      </div>
+      <a class="project-inset" href="https://github.com/MSenden/ONLAF/tree/master">
+          <div class="project-inset-left">Finished</div>
+          <div class="project-inset-right">Github</div>
+      </a>
   </div>
 
   <div class="project">
@@ -72,14 +76,14 @@
           <div class="project-title">LCM-BS</div>
       </div>
 
-      <div class="project-inset">
+      <a class="project-inset">
           <div class="project-inset-left">
               Finished
           </div>
           <div class="project-inset-right">
               Github
           </div>
-      </div>
+      </a>
   </div>
 
 

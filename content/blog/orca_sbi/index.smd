@@ -2,7 +2,7 @@
 .title = "A Python tool for Streamlining Parameter Search in Computational Biology",
 .date = @date("2023-09-03T00:00:00"),
 .description = "Orca provides tools for sequentially running generative models to obtain a well organized dataset of parameters and their associated observables from model simulations.",
-.tags = ["showcase", "inference", "Python", "SnakeMake"],
+.tags = ["inference", "Python", "SnakeMake"],
 .author = "Kris Evers",
 .layout = "blog.shtml",
 .alternatives = [{
