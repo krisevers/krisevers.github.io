@@ -1,0 +1,14 @@
+---
+.title = "Learning Distribution Densities",
+.date = @date("2025-10-01T00:00:00"),
+.description = "Neural networks can be used to learn complex conditional distribution densities. This is useful when you are interested in ",
+.tags = ["machine learning", "cuda", "c"],
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = true,
+---

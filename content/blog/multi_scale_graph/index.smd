@@ -13,199 +13,235 @@
 .draft = false,
 ---
 
-Say you want to build a model of biological tissue (e.g. muscle or hearth tissue) using a set of cells which all have their own position variables. The straight forward way of modelling this is by placing all variables in a continuous array.
-```zig
-const Position = struct { x : i32, y : i32, z : i32 };
-const positions = [_]Position ** 1000;
+Say you want to build a model of biological tissue (e.g. muscle or hearth tissue) using a set of cells which all have their own position variables. The straight forward way of modelling this is by placing all variables in a continuous array. Let's create 1000 cells each with a position in 3D space.
+```c
+int num_cells = 1000;
+struct Position { int x; int y; int z; };
+struct Position[] positions = malloc(num_cells * sizeof(struct Position));
 ```
-The indices into this array are the handles to a cell in the model, assuming you don't shuffle the order of the position data. The moment you want to subdivide a tissue into two or more specific specialized tissues you could just get slices into the array to obtain all positions belonging to one of the tissues:
-```zig
-const muscle_tissue = positions[0..500];
-const heart_tissue = positions[500..1000];
+The indices into this array are the handles to a cell in the model, assuming you don't shuffle the order of the position data. The moment you want to subdivide a tissue into two or more specific specialized tissues you could get a view to the array to obtain all positions belonging to one of the tissues. Let's say the first 500 cells belong to muscle tissue and the others are heart cells. We could use a simple `View` type to get handles to the cells.
+```c
+typedef struct {
+    void* data;
+    size_t size;        // number of elements
+    size_t elem_size;   // size of each element
+} View;
+
+View slice(void* array, size_t elem_size, size_t start, size_t count) {
+    return (View){
+        .data = (char*)array + (start * elem_size),
+        .size = count,
+        .elem_size = elem_size
+    };
+}
+
+struct Position* muscle_tissue = (struct Position*)slice(positions, sizeof(struct Position), 0, 500);
+struct Position* heart_tissue  = (struct Position*)slice(positions, sizeof(struct Position), 500, 500);
+
+// iterating through the muscle_tissue
+for (size_t i=0; i<muscle_tissue.size; i++) {
+    muscle_tissue.data++;
+}
 ```
-This approach to organizing your models works well if all your components operate at the same scale. Model components have a one-to-one relationship and the memory layout is cache-friendly in well suited for SIMD (Single Input, Multiple Data) optimization.
+Now you can access a subset of the cells to perform operations on this subset. This approach to organizing your models works well if all your components operate at the same scale, there are no complex hierarchies. Model components have a one-to-one relationship and the memory layout is cache-friendly and well suited for SIMD (Single Input, Multiple Data) optimization.
 
 But what if there is no one-to-one relation between model components? Such a situation occurs when there are components at different scales which dependent on each other. For example, when computing the mean fiber orientation from the positions in `muscle_tissue`, or when global tissue stress influences individual cell behavior. Ofcourse you could just create a new variable which stores the global variables representing the fiber properties:
-```zig
-const Fiber = struct { pos : Position, orientation: f32, tension: f32 };
+```c
+struct Fiber { View pos; double orientation; double tension; };
 ```
-but the moment you want to extend your model to include more muscle, diversify the tissue, or add even more scales at the top or bottom you run will end up creating a spagetti of dependencies between variables which quickly will become unmanagable. If you are not careful the indices become unstable handles to the data, and adding new components or scales requires extensive refactoring. Using a basic slicing method becomes unmanagable for any model with more than two layers of hierarchy. To prevent running into such problems we need a data structure which makes the hierarchical, multi-scale relationships explicit.
+But this is very cumbersome and not very elegant. It takes a lot of attention to not lose track of all relations between model components and all data arrays needs to kept up to data. Also the moment you want to extend your model to include more muscle, diversify the tissue, or add even more scales at the top or bottom of the hierarchy you run will end up creating a spagetti of dependencies between variables which quickly will become unmanagable. If you are not careful the indices become unstable handles to the data, and adding new components or scales requires extensive refactoring. Using a basic slicing method becomes unmanagable for any model with more than two levels of hierarchy. To prevent running into such problems we need a data structure which makes the hierarchical, multi-scale relationships explicit without losing the cache-friendly allocation of data components.
 
 ## Variables, Collections and Components
 Inspired by component system architectures I use integer handles to represent both variables (e.g. a position, a velocity, a membrane potential) and collections of variables (e.g. a cell, a membrane, a muscle) using unique integer based IDs. Using such handles, defining a model becomes a question of moving around such IDs and writing functionality to make it this an easy process. This way we separate the actual allocation of the model data from the model design. Scientists think in terms of cells, tissues, organs, and ecosystems - not of memory adresses and SIMD registers. Humans tend to model systems as they appear in nature, with clear physical boundaries and dynamics that depend only on local neighborhoods. However, computers excel at performing similar operations in bulk, especially when data is aligned for SIMD operations. Traditional approaches often sacrifice readability and extensibility for performance, forcing researchers to re-optimize their code whenever the model changes. By abstracting the model structure, researchers can focus on implementing the dynamics of individual systems while maintaining a flexible, human-readable way to define the model and its component relationships.
 
-> The remainder of this post explores a possible implementation of such a component based system. Code blocks are written in the `zig` language, so don't forget to `const std = @import("std");`. However, the concepts discussed are general and translates to any systems programming language.
-
 Generating unique IDs could be done with a simple pattern:
-```zig
-fn genID() usize {
-    const S = struct {
-        var uid: std.atomic.Value(usize) = std.atomic.Value(usize).init(0);
-    };
-    return S.uid.fetchAdd(1, .monotonic);
+```c
+static size_t gen_ID() {
+    static atomic_size_t uid = 0;
+    return atomic_fetch_add(&uid, 1);
 }
 ```
 `uid` increments atomically each time `genID()` is called ensuring unique IDs.
 Component specific information can then be kept using arrays of `enums`:
-```zig
-const ComponentType enum {
-    Inactive,
-    Variable,
-    Parameter,
-    Collection,
-};
+```c
+typedef enum {
+    INACTIVE,
+    VARIABLE,
+    PARAMETER,
+    COLLECTION,
+} ComponentType;
 ```
 Now we have a way of creating model components by generating unique IDs.
-```zig
+```c
 test "create components" {
-    const capacity: usize = 10; // max number of components
-    const components: [_]ComponentType{Componenttype.Inactive} ** capacity;
+    const size_t capacity = 10;
+    ComponentType components[capacity] = {};
 
-    const x = genID();
-    const y = genID();
-    const z = genID();
+    const size_t x = gen_ID();
+    const size_t y = gen_ID();
 
-    // position
-    components[x] = ComponentType.Variable;
-    components[y] = ComponentType.Variable;
-    components[z] = ComponentType.Variable;
+    components[x] = VARIABLE;
+    components[y] = PARAMETER;
 
-    try expect(x == 0);
-    try expect(y == 1);
-    try expect(z == 2);
+    assert(components[x] == VARIABLE);
+    assert(components[y] == PARAMETER);
+    assert(components[2] == INACTIVE);
 }
 ```
 
 ## The Multi-Scale Graph
-The second part of the data structure is a graph which handles relationships between components (i.e. IDs). To build such associations we need a container to store these relations, an adjacency matrix (`relations`). For convenience we store the components and relations in a `register`.
-```zig
-const Registry = struct {
-    components: []ComponentType;
-    relations: [][]i32;
-    size: usize;
-    capacity: usize;
-    allocator: std.mem.Allocator,
+The second part of the data structure is a graph which handles relationships between components (i.e. IDs). To build such associations we need a container to store these relations, an adjacency matrix (`relations`). For convenience we store the components and relations in a `registry`.
+```c
+typedef struct {
+    size_t size;
+    size_t capacity;
+    ComponentType* components;
+    size_t* relations;
+} Registry;
 
-    const Self = @This();
+bool init(Registry* reg, size_t capacity) {
 
-    pub fn init(allocator: std.mem.Allocator, capacity: usize) !Self {
-        const components = try allocator.alloc(ComponentType, capacity);
-        @memset(components, ComponentType.Inactive);
+    reg->components = malloc(capacity * sizeof(ComponentType));
+    if (!reg->components) return -1;
+    reg->relations  = malloc(capacity * capacity * sizeof(size_t));
+    if (!reg->relations) return -1;
 
-        const relations = try allocator.alloc([]i32, capacity);
-        for (relations) |*row| {
-            row.* = try allocator.alloc(i32, capacity);
-            @memset(row.*, 0);
-        }
+    reg->size = 0;
+    reg->capacity = capacity;
 
-        return Self{
-            .components = components,
-            .relations  = relations,
-            .size = 0,
-            .capacity = capacity,
-            .allocator = allocator,
-        }
+    for (size_t i = 0; i < capacity; ++i) reg->components[i] = INACTIVE;
+    for (size_t i = 0; i < capacity * capacity; ++i) reg->relations[i] = 0;
+
+    return 1;
+}
+
+bool add(Registry* reg, size_t* uid, ComponentType ctype) {
+    *uid = gen_ID();  // Local variable
+    if (*uid >= reg->capacity) {
+        fprintf(stderr, "registry is at full capacity");
+        return -1;
     }
+    reg->components[*uid] = ctype;
+    reg->size++;
+    return 1;
+}
 
-    pub fn has(self: *const Self, id: usize) bool {
-        return id < capacity && components[id] != ComponentType.Inactive;
-    }
-
-    pub fn add(self: *Self, ctype: ComponentType) usize {
-        const id = genID();
-        if (id >= self.capacity) {
-            // out of bounds
-        }
-        self.components[id] = ctype;
-        self.size += 1;
-        return id;
-    }
+bool has(Registry reg, size_t uid) {
+    return uid < reg.capacity && reg.components[uid] != INACTIVE;
 }
 ```
 Each component can parent a _child_ component as long as the _child_ component is not already a parent of the _parent_ or is down stream in the ancestry-tree of the _child_. This ensures the acyclic property and enforces the hierarchical nature of the graph. Multi-scale models often have a hierarchical tree like structure in which components at a higher abstraction level contain many similar components at a lower abstraction level. Therefore the directed acyclic graph structure is ideal to represent such an architecture. We can provide easy to use functionality to build up the graph by providing the `give` and `assemble` functions below.
-```zig
-pub fn give(reg: *Registry, parent: usize, child: usize, copies: i32) bool {
-    if (!reg.has(parent)) {
-        return false;
+```c
+bool give(Registry* reg, size_t parent, size_t child, size_t copies) {
+    if (!has(*reg, parent) || !has(*reg, child) || hasParentInAncestry(reg, child, parent)) {
+        return -1;
     }
-    if (!reg.has(child)) {
-        return false;
-    }
-    if (!hasParentInAncestry(reg, parent, child)) {
-        return false;
-    }
-    reg.relations[parent, child] = copies;
-    return true;
-};
+    reg->relations[IDX(parent, child, reg->capacity)] = copies;
+    return 1;
+}
 
-pub fn assemble(reg: *Registry, children: []const usize, copies: i32) !usize {
-    parent = reg.add(Collection);
-    for (children) |child| {
-        if (!give(reg, parent, child, copies)) {
-            return error.InvalidConnection;
+bool assemble(Registry* reg, size_t* parent, size_t* children, size_t num_children, size_t copies) {
+    add(reg, parent, COLLECTION);
+    for (size_t i=0; i < num_children; i++) {
+        if (!give(reg, *parent, children[i], copies)) {
+            return -1;
         }
     }
-    return parent;
+    return 1;
 }
 ```
 As one can see we need some additional functionality to get a valid registration of relations between components. By valid I mean we would not want circular relations between components. For example, we would like to make a `leaf` and a `root` children of a `tree`, but then it should be prevented to make `tree` a child of `root`.
-```zig
-test "give components" {
-
-    Registry reg;
-    reg.capacity = 2;
-    tree = reg.add(Variable);
-    leaf = reg.add(Variable);
-    root = reg.add(Variable);
-
-    try expect(give(reg, tree, root, 50));
-    try expect(give(reg, root, tree, 1));   // should fail because we already made tree a parent of root.
-}
+```c
+size_t x;
+add(&reg, &x, VARIABLE);
+printf("%i \n", has(reg, 3));
 ```
 We write the functions `isDescendent` and `hasParentInAncestry` to find out if the requested relation is valid:
-```zig
-fn isDescendant(reg: *const Registry, ancestor: usize, node: usize) bool {
-    if (ancestor == node) return true;
+```c
+// macro for 2D indexing
+#define IDX(row, col, ncol) ((row) * (ncol) + (col))
 
-    // Check all children of ancestor
-    for (0..reg.capacity) |child| {
-        if (reg.relations[ancestor][child] > 0) {
-            if (isDescendant(reg, child, node)) {
-                return true;
+bool isDescendant(Registry* reg, size_t ancestor, size_t node) {
+    if (ancestor == node) return false;
+    if (ancestor >= reg->capacity || node >= reg->capacity) return false;
+
+    bool *visited = calloc(reg->capacity, sizeof(bool));
+    if (!visited) { return false; }
+
+    size_t *stack = malloc(reg->capacity * sizeof(size_t));
+    if (!stack) {
+        free(visited);
+        return false;
+    }
+
+    size_t sp = 0;
+    stack[sp++] = node;
+    visited[node] = true;
+    bool found = false;
+
+    while (sp > 0) {
+        size_t cur = stack[--sp];
+
+        for (size_t i = 0; i < reg->capacity; ++i) {
+            size_t rel = reg->relations[IDX(i, cur, reg->capacity)];
+            if (rel > 0) {
+                if (!visited[i]) {
+                    if (i == ancestor) {
+                        found = true;
+                        goto cleanup;
+                    }
+                    visited[i] = true;
+                    stack[sp++] = i;
+                }
             }
         }
     }
-    return false;
+
+    cleanup:
+        free(stack);
+        free(visited);
+        return found;
 }
 
-fn hasParentInAncestry(reg: *const Registry, potential_parent: usize, potential_child: usize) bool {
-    // Check if potential_parent is already downstream from potential_child
+bool hasParentInAncestry(Registry* reg, size_t potential_parent, size_t potential_child) {
+    // check if parent is already downstream from child
     return isDescendant(reg, potential_child, potential_parent);
 }
 ```
 With minimalistic interface in place it is fairly straighforward to create complex model structures. Let's build up a system of muscle fibers in a flexible way with the above defined graph. We will give all components a position in three dimensions, a cells get a velocity component, and fibers an orientation and tension component. Each fiber consists of 10e5 cells, and we have 42 fibers in total, constituting the muscle tissue:
-```zig
-test "build a fiber model" {
-    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
-    defer arena.deinit();
-    const allocator = arena.allocator;
+```c
+size_t x, y, z, position, dx, dy, dz, velocity, cell, fiber, muscle;
+add(&reg, &x, VARIABLE);
+add(&reg, &y, VARIABLE);
+add(&reg, &z, VARIABLE);
+assemble(&reg, &position, (size_t[]){x, y, z}, 3, 1);
 
-    var r = try Registry.init(allocator, 100);
+add(&reg, &dx, VARIABLE);
+add(&reg, &dy, VARIABLE);
+add(&reg, &dz, VARIABLE);
+assemble(&reg, &velocity, (size_t[]){dx, dy, dz}, 3, 1);
 
-    const x = r.add(ComponentType.Variable);
-    const y = r.add(ComponentType.Variable);
-    const z = r.add(ComponentType.Variable);
-    const position = assemble(r, [x, y, z], 1);
-    const dx = r.add(ComponentType.Variable);
-    const dy = r.add(ComponentType.Variable);
-    const dz = r.add(ComponentType.Variable);
-    const velocity = assemble(r, [x, y, z], 1);
-
-    const cell = assemble(r, [position, velocity], 1);
-    const fiber = assemble(r, [position, cell], 10e5);
-    const muscle = assemble(r, [position, fiber], 42);
-}
+assemble(&reg, &cell, (size_t[]){position, velocity}, 2, 1);
+assemble(&reg, &fiber, (size_t[]){position, cell}, 2, 10e5);
+assemble(&reg, &muscle, (size_t[]){position, fiber}, 2, 42);
 ```
-We now track all model components using unique IDs (e.g. `x`, `cell`, `fiber`, `muscle`) which function as flexible building blocks of the model. Now we have an interface for building models in the language of natural hierarchies. The directed acyclic graph holds all information on the relations between components, how many allocations should be made of each component and essentially where one should look to find a particular data point belonging to a specific part of the model.
-
+This will create the set of relations summarized in the table below. We now track all model components using unique IDs (e.g. `x`, `cell`, `fiber`, `muscle`) which function as flexible building blocks of the model. Now we have an interface for building models in the language of hierarchies. The directed acyclic graph holds all information on the relations between components, how many allocations should be made of each component and essentially where one should look to find a particular data point belonging to a specific part of the model.
+```
+┌──────┬────────────┬─────────────────────────────────────┐
+│  ID  │    Type    │             Children                │
+├──────┼────────────┼─────────────────────────────────────┤
+│    0 │ VARIABLE   │                                     │
+│    1 │ VARIABLE   │                                     │
+│    2 │ VARIABLE   │                                     │
+│    3 │ COLLECTION │ 0(1), 1(1), 2(1)                    │
+│    4 │ VARIABLE   │                                     │
+│    5 │ VARIABLE   │                                     │
+│    6 │ VARIABLE   │                                     │
+│    7 │ COLLECTION │ 4(1), 5(1), 6(1)                    │
+│    8 │ COLLECTION │ 3(1), 7(1)                          │
+│    9 │ COLLECTION │ 3(1000000), 8(1000000)              │
+│   10 │ COLLECTION │ 3(42), 9(42)                        │
+└──────┴────────────┴─────────────────────────────────────┘
+format: ID(copies)
+```
 We have not allocated any data components yet. In a next article I will describe how allocation can be done with SIMD operations in mind, and implement a `view` interface to expose the subsets of the data using the graph for specific computations on parts of the data.

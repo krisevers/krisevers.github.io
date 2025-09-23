@@ -1,0 +1,28 @@
+#### Introduction section:
+
+Add specific examples of the computational challenges each subfield faces (e.g., phylogenetic tree reconstruction in evolution, protein folding simulations in molecular biology)
+Explain why current isolated approaches fail for multi-scale problems - what specific technical barriers exist?
+
+#### Digital twins section:
+
+Expand on what makes multi-scale integration so difficult technically. Why can't we just connect existing models?
+Give a concrete example of how blood sample data and fMRI would actually conflict or require different modeling approaches
+Discuss current attempts at digital twins and where they're falling short
+
+#### Data-Oriented Design section:
+
+Compare DOD more directly to how biological modeling currently works. What would a typical neuroscience simulation look like in OOD vs DOD?
+Add technical details about performance benefits - cache hits, memory bandwidth, vectorization opportunities
+Include a concrete code example or pseudocode showing the difference
+
+#### Compositionality section:
+
+Develop the muscle cell example into a full walkthrough showing how the same data structures would be accessed by neural, cellular, and tissue-level systems
+Discuss how this differs from current approaches where each scale has its own data formats and interfaces
+Address potential downsides - what complexity does this separation introduce?
+
+#### Performance section:
+
+Quantify the performance claims with examples from game engines or other DOD applications
+Discuss specific parallelization strategies that become possible
+Address the trade-offs between performance and model interpretability
