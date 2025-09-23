@@ -2,7 +2,7 @@
 .title = "Representing Multi-Scale Systems using Directed Acyclic Graphs",
 .date = @date("2025-08-07T00:00:00"),
 .description = "Implementation of a data-oriented data structure: a directed acyclic graph. The data structure can be used to build large systems of many hierarchically related components while keeping cache-friendly memory allocations.",
-.tags = ["idea", "zig"],
+.tags = ["idea", "c"],
 .author = "Kris Evers",
 .layout = "blog.shtml",
 .alternatives = [{
