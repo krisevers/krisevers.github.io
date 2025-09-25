@@ -39,7 +39,7 @@ struct Position* heart_tissue  = (struct Position*)slice(positions, sizeof(struc
 
 // iterating through the muscle_tissue
 for (size_t i=0; i<muscle_tissue.size; i++) {
-    muscle_tissue.data++;
+    muscle_tissue.data[i]++;
 }
 ```
 Now you can access a subset of the cells to perform operations on this subset. This approach to organizing your models works well if all your components operate at the same scale, there are no complex hierarchies. Model components have a one-to-one relationship and the memory layout is cache-friendly and well suited for SIMD (Single Input, Multiple Data) optimization.
