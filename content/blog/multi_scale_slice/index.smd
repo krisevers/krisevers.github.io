@@ -1,0 +1,53 @@
+---
+.title = "Allocating Large Objects using Graph Information",
+.date = @date("2025-09-23T00:00:00"),
+.description = "In a previous post I showed how a DAG can be used to store structural information on large hierarchical models. In this post I walk through an implementation of the data allocation procedure and how to inspect the data",
+.tags = ["idea", "c"],
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = true,
+---
+
+> If you haven't read the previous post I recommend going there first.
+
+Using a directed-acyclic graph we can represent relations between hierarchically organized model components. For example, using the code from my earlier post we could assemble a hypothetical muscle with 42 fibers, which each have 1000000 cells, which in turn each have a position and a velocity data component:
+```c
+size_t x, y, z, position, dx, dy, dz, velocity, cell, fiber, muscle;
+add(&reg, &x, VARIABLE);
+add(&reg, &y, VARIABLE);
+add(&reg, &z, VARIABLE);
+assemble(&reg, &position, (size_t[]){x, y, z}, 3, 1);
+
+add(&reg, &dx, VARIABLE);
+add(&reg, &dy, VARIABLE);
+add(&reg, &dz, VARIABLE);
+assemble(&reg, &velocity, (size_t[]){dx, dy, dz}, 3, 1);
+
+assemble(&reg, &cell, (size_t[]){position, velocity}, 2, 1);
+assemble(&reg, &fiber, (size_t[]){position, cell}, 2, 10e5);
+assemble(&reg, &muscle, (size_t[]){position, fiber}, 2, 42);
+```
+This results in a `Registry` which holds all `relations` between components summarized in this table:
+| ID   | Type       | Children **ID(copies)**             |
+| :--- | :--------: | :---------------------------------: |
+|    0 | VARIABLE   |                                     |
+|    1 | VARIABLE   |                                     |
+|    2 | VARIABLE   |                                     |
+|    3 | COLLECTION | 0(1), 1(1), 2(1)                    |
+|    4 | VARIABLE   |                                     |
+|    5 | VARIABLE   |                                     |
+|    6 | VARIABLE   |                                     |
+|    7 | COLLECTION | 4(1), 5(1), 6(1)                    |
+|    8 | COLLECTION | 3(1), 7(1)                          |
+|    9 | COLLECTION | 3(1000000), 8(1000000)              |
+|   10 | COLLECTION | 3(42), 9(42)                        |
+
+We see that in this particular `registry` there are two types of components: `VARIABLE` and `COLLECTION`. I've previously made this distinction because we would like to know what components are data components and what components are composed of other components.
+
+* cache-size
+* what is the max memory that can be allocated at a single moment in time (address space)

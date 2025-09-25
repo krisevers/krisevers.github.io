@@ -125,6 +125,12 @@
     <span class="keyword">return</span> <span class="number">1</span><span class="delimiter">;</span>
 }
 
+<span class="type">void</span> <span class="constant variable function">cleanup</span>(<span class="type">Registry</span><span class="operator">*</span> <span class="constant variable">reg</span>) {
+    <span class="constant variable function">free</span>(<span class="constant variable">reg</span><span class="operator">-&gt;</span><span class="property">components</span>)<span class="delimiter">;</span>
+    <span class="constant variable function">free</span>(<span class="constant variable">reg</span><span class="operator">-&gt;</span><span class="property">relations</span>)<span class="delimiter">;</span>
+    <span class="constant variable function">free</span>(<span class="constant variable">reg</span>)<span class="delimiter">;</span>
+}
+
 <span class="type">bool</span> <span class="constant variable function">add</span>(<span class="type">Registry</span><span class="operator">*</span> <span class="constant variable">reg</span>, <span class="type">size_t</span><span class="operator">*</span> <span class="constant variable">uid</span>, <span class="type">ComponentType</span> <span class="constant variable">ctype</span>) {
     <span class="operator">*</span><span class="constant variable">uid</span> <span class="operator">=</span> <span class="constant variable function">gen_ID</span>()<span class="delimiter">;</span>  <span class="comment">// Local variable</span>
     <span class="keyword">if</span> (<span class="operator">*</span><span class="constant variable">uid</span> &gt;= <span class="constant variable">reg</span><span class="operator">-&gt;</span><span class="property">capacity</span>) {
@@ -141,7 +147,7 @@
 }
 </code></pre>
 <p>Each component can parent a <em>child</em> component as long as the <em>child</em> component is not already a parent of the <em>parent</em> or is down stream in the ancestry-tree of the <em>child</em>. This ensures the acyclic property and enforces the hierarchical nature of the graph. Multi-scale models often have a hierarchical tree like structure in which components at a higher abstraction level contain many similar components at a lower abstraction level. Therefore the directed acyclic graph structure is ideal to represent such an architecture. We can provide easy to use functionality to build up the graph by providing the <code>give</code> and <code>assemble</code> functions below.</p><pre><code class="c"><span class="type">bool</span> <span class="constant variable function">give</span>(<span class="type">Registry</span><span class="operator">*</span> <span class="constant variable">reg</span>, <span class="type">size_t</span> <span class="constant variable">parent</span>, <span class="type">size_t</span> <span class="constant variable">child</span>, <span class="type">size_t</span> <span class="constant variable">copies</span>) {
-    <span class="keyword">if</span> (!<span class="constant variable function">has</span>(<span class="operator">*</span><span class="constant variable">reg</span>, <span class="constant variable">parent</span>) <span class="operator">||</span> !<span class="constant variable function">has</span>(<span class="operator">*</span><span class="constant variable">reg</span>, <span class="constant variable">child</span>) <span class="operator">||</span> <span class="constant variable function">hasParentInAncestry</span>(<span class="constant variable">reg</span>, <span class="constant variable">child</span>, <span class="constant variable">parent</span>)) {
+    <span class="keyword">if</span> (!<span class="constant variable function">has</span>(<span class="operator">*</span><span class="constant variable">reg</span>, <span class="constant variable">parent</span>) <span class="operator">||</span> !<span class="constant variable function">has</span>(<span class="operator">*</span><span class="constant variable">reg</span>, <span class="constant variable">child</span>) <span class="operator">||</span> <span class="constant variable function">isDescendant</span>(<span class="constant variable">reg</span>, <span class="constant variable">child</span>, <span class="constant variable">parent</span>)) {
         <span class="keyword">return</span> <span class="number">-1</span><span class="delimiter">;</span>
     }
     <span class="constant variable">reg</span><span class="operator">-&gt;</span><span class="property">relations</span>[<span class="constant variable function">IDX</span>(<span class="constant variable">parent</span>, <span class="constant variable">child</span>, <span class="constant variable">reg</span><span class="operator">-&gt;</span><span class="property">capacity</span>)] <span class="operator">=</span> <span class="constant variable">copies</span><span class="delimiter">;</span>
@@ -192,7 +198,7 @@
                 <span class="keyword">if</span> (!<span class="constant variable">visited</span>[<span class="constant variable">i</span>]) {
                     <span class="keyword">if</span> (<span class="constant variable">i</span> <span class="operator">==</span> <span class="constant variable">ancestor</span>) {
                         <span class="constant variable">found</span> <span class="operator">=</span> true<span class="delimiter">;</span>
-                        goto <span class="label">cleanup</span><span class="delimiter">;</span>
+                        <span class="keyword">break</span><span class="delimiter">;</span>
                     }
                     <span class="constant variable">visited</span>[<span class="constant variable">i</span>] <span class="operator">=</span> true<span class="delimiter">;</span>
                     <span class="constant variable">stack</span>[<span class="constant variable">sp</span><span class="operator">++</span>] <span class="operator">=</span> <span class="constant variable">i</span><span class="delimiter">;</span>
@@ -200,16 +206,9 @@
             }
         }
     }
-
-    <span class="label">cleanup</span>:
-        <span class="constant variable function">free</span>(<span class="constant variable">stack</span>)<span class="delimiter">;</span>
-        <span class="constant variable function">free</span>(<span class="constant variable">visited</span>)<span class="delimiter">;</span>
-        <span class="keyword">return</span> <span class="constant variable">found</span><span class="delimiter">;</span>
-}
-
-<span class="type">bool</span> <span class="constant variable function">hasParentInAncestry</span>(<span class="type">Registry</span><span class="operator">*</span> <span class="constant variable">reg</span>, <span class="type">size_t</span> <span class="constant variable">potential_parent</span>, <span class="type">size_t</span> <span class="constant variable">potential_child</span>) {
-    <span class="comment">// check if parent is already downstream from child</span>
-    <span class="keyword">return</span> <span class="constant variable function">isDescendant</span>(<span class="constant variable">reg</span>, <span class="constant variable">potential_child</span>, <span class="constant variable">potential_parent</span>)<span class="delimiter">;</span>
+    <span class="constant variable function">free</span>(<span class="constant variable">stack</span>)<span class="delimiter">;</span>
+    <span class="constant variable function">free</span>(<span class="constant variable">visited</span>)<span class="delimiter">;</span>
+    <span class="keyword">return</span> <span class="constant variable">found</span><span class="delimiter">;</span>
 }
 </code></pre>
 <p>With minimalistic interface in place it is fairly straighforward to create complex model structures. Let’s build up a system of muscle fibers in a flexible way with the above defined graph. We will give all components a position in three dimensions, a cells get a velocity component, and fibers an orientation and tension component. Each fiber consists of 10e5 cells, and we have 42 fibers in total, constituting the muscle tissue:</p><pre><code class="c"><span class="type">size_t</span> <span class="constant variable">x</span>, <span class="constant variable">y</span>, <span class="constant variable">z</span>, <span class="constant variable">position</span>, <span class="constant variable">dx</span>, <span class="constant variable">dy</span>, <span class="constant variable">dz</span>, <span class="constant variable">velocity</span>, <span class="constant variable">cell</span>, <span class="constant variable">fiber</span>, <span class="constant variable">muscle</span><span class="delimiter">;</span>
@@ -227,23 +226,7 @@
 <span class="constant variable function">assemble</span>(<span class="operator">&amp;</span><span class="constant variable">reg</span>, <span class="operator">&amp;</span><span class="constant variable">fiber</span>, (<span class="type">size_t</span>[]){<span class="constant variable">position</span>, <span class="constant variable">cell</span>}, <span class="number">2</span>, <span class="number">10e5</span>)<span class="delimiter">;</span>
 <span class="constant variable function">assemble</span>(<span class="operator">&amp;</span><span class="constant variable">reg</span>, <span class="operator">&amp;</span><span class="constant variable">muscle</span>, (<span class="type">size_t</span>[]){<span class="constant variable">position</span>, <span class="constant variable">fiber</span>}, <span class="number">2</span>, <span class="number">42</span>)<span class="delimiter">;</span>
 </code></pre>
-<p>This will create the set of relations summarized in the table below. We now track all model components using unique IDs (e.g. <code>x</code>, <code>cell</code>, <code>fiber</code>, <code>muscle</code>) which function as flexible building blocks of the model. Now we have an interface for building models in the language of hierarchies. The directed acyclic graph holds all information on the relations between components, how many allocations should be made of each component and essentially where one should look to find a particular data point belonging to a specific part of the model.</p><pre><code>┌──────┬────────────┬─────────────────────────────────────┐
-│  ID  │    Type    │             Children                │
-├──────┼────────────┼─────────────────────────────────────┤
-│    0 │ VARIABLE   │                                     │
-│    1 │ VARIABLE   │                                     │
-│    2 │ VARIABLE   │                                     │
-│    3 │ COLLECTION │ 0(1), 1(1), 2(1)                    │
-│    4 │ VARIABLE   │                                     │
-│    5 │ VARIABLE   │                                     │
-│    6 │ VARIABLE   │                                     │
-│    7 │ COLLECTION │ 4(1), 5(1), 6(1)                    │
-│    8 │ COLLECTION │ 3(1), 7(1)                          │
-│    9 │ COLLECTION │ 3(1000000), 8(1000000)              │
-│   10 │ COLLECTION │ 3(42), 9(42)                        │
-└──────┴────────────┴─────────────────────────────────────┘
-format: ID(copies)
-</code></pre><p>We have not allocated any data components yet. In a next article I will describe how allocation can be done with SIMD operations in mind, and implement a <code>view</code> interface to expose the subsets of the data using the graph for specific computations on parts of the data.</p></div>
+<p>This will create the set of relations summarized in the table below. We now track all model components using unique IDs (e.g. <code>x</code>, <code>cell</code>, <code>fiber</code>, <code>muscle</code>) which function as flexible building blocks of the model. Now we have an interface for building models in the language of hierarchies. The directed acyclic graph holds all information on the relations between components, how many allocations should be made of each component and essentially where one should look to find a particular data point belonging to a specific part of the model.</p><table><tr><th align='left'>ID</th><th align='center'>Name</th><th align='center'>Type</th><th align='center'>Children <strong>ID(copies)</strong></th></tr><tr><td align='left'>0</td><td align='center'>x</td><td align='center'>VARIABLE</td><td align='center'></td></tr><tr><td align='left'>1</td><td align='center'>y</td><td align='center'>VARIABLE</td><td align='center'></td></tr><tr><td align='left'>2</td><td align='center'>z</td><td align='center'>VARIABLE</td><td align='center'></td></tr><tr><td align='left'>3</td><td align='center'>position</td><td align='center'>COLLECTION</td><td align='center'>0(1), 1(1), 2(1)</td></tr><tr><td align='left'>4</td><td align='center'>dx</td><td align='center'>VARIABLE</td><td align='center'></td></tr><tr><td align='left'>5</td><td align='center'>dy</td><td align='center'>VARIABLE</td><td align='center'></td></tr><tr><td align='left'>6</td><td align='center'>dz</td><td align='center'>VARIABLE</td><td align='center'></td></tr><tr><td align='left'>7</td><td align='center'>velocity</td><td align='center'>COLLECTION</td><td align='center'>4(1), 5(1), 6(1)</td></tr><tr><td align='left'>8</td><td align='center'>cell</td><td align='center'>COLLECTION</td><td align='center'>3(1), 7(1)</td></tr><tr><td align='left'>9</td><td align='center'>fiber</td><td align='center'>COLLECTION</td><td align='center'>3(1000000), 8(1000000)</td></tr><tr><td align='left'>10</td><td align='center'>muscle</td><td align='center'>COLLECTION</td><td align='center'>3(42), 9(42)</td></tr></table><p>We have not allocated any data components yet. In a next article I will describe how allocation can be done with SIMD operations in mind, and implement a <code>view</code> interface to expose the subsets of the data using the graph for specific computations on parts of the data.</p></div>
   <div>
      <!--<h2>Post list</h2>-->
     <div></div>

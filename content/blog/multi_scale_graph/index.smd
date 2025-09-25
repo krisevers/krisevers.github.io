@@ -12,7 +12,6 @@
 }],
 .draft = false,
 ---
-
 Say you want to build a model of biological tissue (e.g. muscle or hearth tissue) using a set of cells which all have their own position variables. The straight forward way of modelling this is by placing all variables in a continuous array. Let's create 1000 cells each with a position in 3D space.
 ```c
 int num_cells = 1000;
@@ -115,6 +114,12 @@ bool init(Registry* reg, size_t capacity) {
     return 1;
 }
 
+void cleanup(Registry* reg) {
+    free(reg->components);
+    free(reg->relations);
+    free(reg);
+}
+
 bool add(Registry* reg, size_t* uid, ComponentType ctype) {
     *uid = gen_ID();  // Local variable
     if (*uid >= reg->capacity) {
@@ -133,7 +138,7 @@ bool has(Registry reg, size_t uid) {
 Each component can parent a _child_ component as long as the _child_ component is not already a parent of the _parent_ or is down stream in the ancestry-tree of the _child_. This ensures the acyclic property and enforces the hierarchical nature of the graph. Multi-scale models often have a hierarchical tree like structure in which components at a higher abstraction level contain many similar components at a lower abstraction level. Therefore the directed acyclic graph structure is ideal to represent such an architecture. We can provide easy to use functionality to build up the graph by providing the `give` and `assemble` functions below.
 ```c
 bool give(Registry* reg, size_t parent, size_t child, size_t copies) {
-    if (!has(*reg, parent) || !has(*reg, child) || hasParentInAncestry(reg, child, parent)) {
+    if (!has(*reg, parent) || !has(*reg, child) || isDescendant(reg, child, parent)) {
         return -1;
     }
     reg->relations[IDX(parent, child, reg->capacity)] = copies;
@@ -188,7 +193,7 @@ bool isDescendant(Registry* reg, size_t ancestor, size_t node) {
                 if (!visited[i]) {
                     if (i == ancestor) {
                         found = true;
-                        goto cleanup;
+                        break;
                     }
                     visited[i] = true;
                     stack[sp++] = i;
@@ -196,16 +201,9 @@ bool isDescendant(Registry* reg, size_t ancestor, size_t node) {
             }
         }
     }
-
-    cleanup:
-        free(stack);
-        free(visited);
-        return found;
-}
-
-bool hasParentInAncestry(Registry* reg, size_t potential_parent, size_t potential_child) {
-    // check if parent is already downstream from child
-    return isDescendant(reg, potential_child, potential_parent);
+    free(stack);
+    free(visited);
+    return found;
 }
 ```
 With minimalistic interface in place it is fairly straighforward to create complex model structures. Let's build up a system of muscle fibers in a flexible way with the above defined graph. We will give all components a position in three dimensions, a cells get a velocity component, and fibers an orientation and tension component. Each fiber consists of 10e5 cells, and we have 42 fibers in total, constituting the muscle tissue:
@@ -226,22 +224,18 @@ assemble(&reg, &fiber, (size_t[]){position, cell}, 2, 10e5);
 assemble(&reg, &muscle, (size_t[]){position, fiber}, 2, 42);
 ```
 This will create the set of relations summarized in the table below. We now track all model components using unique IDs (e.g. `x`, `cell`, `fiber`, `muscle`) which function as flexible building blocks of the model. Now we have an interface for building models in the language of hierarchies. The directed acyclic graph holds all information on the relations between components, how many allocations should be made of each component and essentially where one should look to find a particular data point belonging to a specific part of the model.
-```
-┌──────┬────────────┬─────────────────────────────────────┐
-│  ID  │    Type    │             Children                │
-├──────┼────────────┼─────────────────────────────────────┤
-│    0 │ VARIABLE   │                                     │
-│    1 │ VARIABLE   │                                     │
-│    2 │ VARIABLE   │                                     │
-│    3 │ COLLECTION │ 0(1), 1(1), 2(1)                    │
-│    4 │ VARIABLE   │                                     │
-│    5 │ VARIABLE   │                                     │
-│    6 │ VARIABLE   │                                     │
-│    7 │ COLLECTION │ 4(1), 5(1), 6(1)                    │
-│    8 │ COLLECTION │ 3(1), 7(1)                          │
-│    9 │ COLLECTION │ 3(1000000), 8(1000000)              │
-│   10 │ COLLECTION │ 3(42), 9(42)                        │
-└──────┴────────────┴─────────────────────────────────────┘
-format: ID(copies)
-```
+| ID   | Name     | Type       | Children **ID(copies)**             |
+| :--- | :------: | :--------: | :---------------------------------: |
+|    0 | x        | VARIABLE   |                                     |
+|    1 | y        | VARIABLE   |                                     |
+|    2 | z        | VARIABLE   |                                     |
+|    3 | position | COLLECTION | 0(1), 1(1), 2(1)                    |
+|    4 | dx       | VARIABLE   |                                     |
+|    5 | dy       | VARIABLE   |                                     |
+|    6 | dz       | VARIABLE   |                                     |
+|    7 | velocity | COLLECTION | 4(1), 5(1), 6(1)                    |
+|    8 | cell     | COLLECTION | 3(1), 7(1)                          |
+|    9 | fiber    | COLLECTION | 3(1000000), 8(1000000)              |
+|   10 | muscle   | COLLECTION | 3(42), 9(42)                        |
+
 We have not allocated any data components yet. In a next article I will describe how allocation can be done with SIMD operations in mind, and implement a `view` interface to expose the subsets of the data using the graph for specific computations on parts of the data.

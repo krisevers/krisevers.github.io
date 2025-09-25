@@ -1,0 +1,14 @@
+---
+.title = "Experiences building with Zine & Zig",
+.date = @date("2025-09-30T00:00:00"),
+.description = "This website is build using `zine` and `zig`. I'll write a bit about my experience and go through some details that might not be obvious from the documentation.",
+.tags = ["webdesign", "zine", "zig"],
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = true,
+---
