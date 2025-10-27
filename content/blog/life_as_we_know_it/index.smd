@@ -1,0 +1,13 @@
+---
+.title = "Life as we know it",
+.date = @date("2025-09-03T00:00:00"),
+.author = "Kris Evers",
+.layout = "blog.shtml",
+.alternatives = [{
+    .name = "rss",
+    .layout = "blog.xml",
+    .output = "index.xml",
+}],
+.draft = true,
+---
+// implement the 2D free-energy algorithm and show how particles move with respect to each other.
